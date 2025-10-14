@@ -1,0 +1,4 @@
+virtualenv
+Flask
+pytq
+flask-sqlalchemy
