@@ -65,7 +65,7 @@ class AuthWindow(QWidget):
         button_layout = QHBoxLayout()
         button_layout.setSpacing(20)
 
-        signup_button = QPushButton("Sign Up")
+        signup_button = QPushButton("S'inscrire")
         signup_button.setFont(QFont("Arial", 12, QFont.Bold))
         signup_button.setCursor(Qt.PointingHandCursor)
         signup_button.setStyleSheet("""
@@ -82,7 +82,7 @@ class AuthWindow(QWidget):
         """)
         signup_button.clicked.connect(self.handle_signup)
 
-        signin_button = QPushButton("Sign In")
+        signin_button = QPushButton("Connecter")
         signin_button.setFont(QFont("Arial", 12, QFont.Bold))
         signin_button.setCursor(Qt.PointingHandCursor)
         signin_button.setStyleSheet("""

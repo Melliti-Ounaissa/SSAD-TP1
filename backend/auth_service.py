@@ -1,4 +1,4 @@
-from backend.database import get_supabase_client
+from .database import get_supabase_client
 
 
 class AuthService:

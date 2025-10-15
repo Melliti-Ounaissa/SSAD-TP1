@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from backend.auth_service import AuthService
-from backend.message_service import MessageService
-from backend.crypto_service import CryptoService
+from .auth_service import AuthService
+from .message_service import MessageService
+from .crypto_service import CryptoService
 
 app = Flask(__name__)
 CORS(app)
