@@ -1,4 +1,4 @@
 virtualenv
 Flask
-pytq
+PyQt5
 flask-sqlalchemy
