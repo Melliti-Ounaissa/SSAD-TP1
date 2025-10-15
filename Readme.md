@@ -40,7 +40,7 @@ VITE_SUPABASE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 **Terminal 1** - Start Flask backend:
 ```bash
-python backend/flask_app.py
+python flask_app_run.py
 ```
 
 **Terminal 2** - Start PyQt5 desktop app:
