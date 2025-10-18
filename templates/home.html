@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Toolkit - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <button class="back-button" onclick="window.location.href='/'">←</button>
+
+            <nav class="nav-menu">
+                <a href="/messages" class="nav-item">
+                    <span class="nav-icon">📧</span>
+                    <span class="nav-text">Messages</span>
+                </a>
+                <a href="/algorithms" class="nav-item">
+                    <span class="nav-icon">🧠</span>
+                    <span class="nav-text">Algorithmes<br>de Cryptage</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon">⚔️</span>
+                    <span class="nav-text">Attaques</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="/logout" class="logout-link">Se déconnecter</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="welcome-section">
+                <h1>Boîte à outils de<br>cryptographie classique et<br>méthodes d'attaque</h1>
+                <p class="user-info">Connecté en tant que: <strong>{{ user.email }}</strong></p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

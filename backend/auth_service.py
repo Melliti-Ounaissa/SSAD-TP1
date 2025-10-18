@@ -1,4 +1,5 @@
 from .database import get_supabase_client
+from .password_validator import PasswordValidator
 
 
 class AuthService:
@@ -7,6 +8,10 @@ class AuthService:
 
     def sign_up(self, email, password):
         try:
+            is_valid, validation_message = PasswordValidator.validate_password(password)
+            if not is_valid:
+                return {"success": False, "message": "Invalid password"}
+
             existing_user = self.supabase.table('users').select('*').eq('email', email).execute()
 
             if existing_user.data and len(existing_user.data) > 0:

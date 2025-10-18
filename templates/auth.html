@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Toolkit - Authentication</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <div class="form-container">
+                <h1>Bienvenue !</h1>
+
+                <div class="input-group">
+                    <input type="email" id="email" placeholder="@ Email" required>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="🔒 Password" required>
+                </div>
+
+                <div class="password-hint">
+                    <p><strong>Password formats:</strong></p>
+                    <ul>
+                        <li>3 characters (2, 3, or 4): e.g., 234, 432</li>
+                        <li>5 digits (0-9): e.g., 12345</li>
+                        <li>6 characters (a-z, A-Z, 0-9, +, *): e.g., q7*88+</li>
+                    </ul>
+                </div>
+
+                <div class="error-message" id="error-message"></div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" id="signup-btn">Sign Up</button>
+                    <button class="btn btn-secondary" id="signin-btn">Sign In</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="image-container">
+                <div class="security-illustration">
+                    <div class="lock-icon">🔐</div>
+                    <p>Secure Cryptography</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

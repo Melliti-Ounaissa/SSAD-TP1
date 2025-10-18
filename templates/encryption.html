@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Toolkit - {{ algorithm|capitalize }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <button class="back-button" onclick="window.location.href='/home'">←</button>
+
+            <nav class="nav-menu">
+                <a href="/messages" class="nav-item">
+                    <span class="nav-icon">📧</span>
+                    <span class="nav-text">Messages</span>
+                </a>
+                <a href="/algorithms" class="nav-item">
+                    <span class="nav-icon">🧠</span>
+                    <span class="nav-text">Algorithmes<br>de Cryptage</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon">⚔️</span>
+                    <span class="nav-text">Attaques</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="algorithm-header">
+                <h1 class="algorithm-title">{{ algorithm|capitalize }}</h1>
+            </div>
+
+            <div class="encryption-section">
+                <label class="section-label">message chiffré</label>
+                <div class="encrypted-box" id="encrypted-display">
+                    Le message chiffré apparaîtra ici...
+                </div>
+            </div>
+
+            <div class="transmission-container">
+                <div class="sender-section">
+                    <div class="computer-icon">💻</div>
+                    <label class="section-label">votre message</label>
+                    <textarea id="message-input" class="message-input" placeholder="Entrez votre message..."></textarea>
+                </div>
+
+                <div class="transmission-line">
+                    ━━━━━━━━━━→
+                </div>
+
+                <div class="receiver-section">
+                    <div class="computer-icon">💻</div>
+                    <label class="section-label">message reçu</label>
+                    <div class="message-output" id="decrypted-display">
+                        Le message déchiffré apparaîtra ici...
+                    </div>
+                </div>
+            </div>
+
+            <div class="send-section">
+                <div class="recipient-select">
+                    <label>Destinataire:</label>
+                    <select id="recipient-select" class="recipient-dropdown">
+                        <option value="">Choisir un destinataire...</option>
+                    </select>
+                </div>
+                <button class="btn-send" onclick="sendMessage()">Envoyer</button>
+            </div>
+
+            <div class="error-message" id="error-message"></div>
+        </main>
+    </div>
+
+    <script>
+        const userId = {{ user.id }};
+        const algorithm = "{{ algorithm }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/encryption.js') }}"></script>
+</body>
+</html>
