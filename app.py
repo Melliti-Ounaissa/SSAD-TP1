@@ -1,11 +1,10 @@
-# Import necessary libraries from Flask and other packages
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_cors import CORS
-
-# Import your custom service modules from the backend package
 from backend.auth_service import AuthService
 from backend.message_service import MessageService
 from backend.crypto_service import CryptoService
+import os                              
+from dotenv import load_dotenv
 
 # --- App Initialization and Configuration ---
 
@@ -14,11 +13,10 @@ from backend.crypto_service import CryptoService
 app = Flask(__name__,
             template_folder='templates',
             static_folder='static')
-# A secret key is required for session management
-app.secret_key = 'your-secret-key-here-change-in-production'
 # Enable Cross-Origin Resource Sharing (CORS) for the app
 CORS(app)
 
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
 # --- Service Instantiation ---
 
 # Create instances of your service classes to handle business logic
