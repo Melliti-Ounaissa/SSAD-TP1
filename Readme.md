@@ -1,10 +1,10 @@
-# Cryptography Toolkit - Educational Desktop Application
+# Cryptography Toolkit - Educational Web Application
 
-A Python desktop application demonstrating classical cryptography algorithms with real-time messaging capabilities.
+A Python web application demonstrating classical cryptography algorithms with real-time messaging capabilities.
 
 ## Features
 
-- User authentication (Sign Up/Sign In)
+- User authentication with password validation (3 specific formats)
 - Classical cryptography algorithms:
   - Caesar Cipher (shift = 3)
   - Affine Cipher (a=5, b=8)
@@ -13,6 +13,14 @@ A Python desktop application demonstrating classical cryptography algorithms wit
 - Real-time encrypted messaging between users
 - Message history (sent/received)
 - Visual encryption/decryption demonstration
+- Web-based interface (HTML/CSS/JavaScript)
+
+## Password Requirements
+
+Passwords must follow ONE of these formats:
+1. **3 characters**: Each can be 2, 3, or 4 (e.g., `234`, `432`)
+2. **5 digits**: 0-9 (e.g., `12345`)
+3. **6 characters**: a-z, A-Z, 0-9, +, * (e.g., `q7*88+`)
 
 ## Quick Start
 
@@ -36,27 +44,24 @@ VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-### 4. Run the Application
+### 4. Run the Web Application
 
-**Terminal 1** - Start Flask backend:
 ```bash
-python flask_app_run.py
+python run_webapp.py
 ```
 
-**Terminal 2** - Start PyQt5 desktop app:
-```bash
-python app.py
-```
+Then open your browser to: **http://localhost:5000**
 
 ## Full Documentation
 
-- `SETUP_AND_RUN.md` - Complete setup and usage guide
+- `WEB_APP_SETUP.md` - Complete web app setup and usage guide
 - `DATABASE_SETUP.md` - Database configuration instructions
+- `SETUP_AND_RUN.md` - Original desktop app documentation (legacy)
 
 ## Technology Stack
 
-- **Frontend**: PyQt5
-- **Backend**: Flask
+- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
+- **Backend**: Flask with session management
 - **Database**: Supabase (PostgreSQL)
 - **Cryptography**: Custom implementations
 
