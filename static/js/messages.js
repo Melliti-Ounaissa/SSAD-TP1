@@ -1,8 +1,15 @@
 const sentMessagesList = document.getElementById('sent-messages');
 const receivedMessagesList = document.getElementById('received-messages');
 
+// Helper to capitalize the first letter of a string
+function capitalizeFirst(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 async function loadMessages() {
     try {
+        // userId is defined in messages.html script block
         const [sentResponse, receivedResponse] = await Promise.all([
             fetch(`/api/messages/sent/${userId}`),
             fetch(`/api/messages/received/${userId}`)
@@ -48,27 +55,29 @@ function createMessageCard(message, isSent) {
     const card = document.createElement('div');
     card.className = 'message-card';
 
-    const recipientEmail = isSent
-        ? (message.users?.email || 'Unknown')
-        : (message.users?.email || 'Unknown');
+    // CHANGED 'email' to 'username' in the message object access
+    const recipientUsername = isSent
+        ? (message.users?.username || 'Unknown') // For sent messages, this is the recipient's username
+        : (message.users?.username || 'Unknown'); // For received messages, this is the sender's username
 
-    const headerText = isSent ? `À: ${recipientEmail}` : `De: ${recipientEmail}`;
+    const headerText = isSent ? `À: ${recipientUsername}` : `De: ${recipientUsername}`; 
     const date = new Date(message.date_created).toLocaleString('fr-FR');
+    
+    // message.content is now the decrypted message (added by server)
+    // message.encrypted is the original crypted message (from DB)
 
     card.innerHTML = `
         <div class="message-header">${headerText}</div>
         <div class="message-meta">Algorithme: ${capitalizeFirst(message.algo_name)}</div>
         <div class="message-meta">Date: ${date}</div>
-        <div class="message-content">Message: ${message.content}</div>
-        <div class="message-encrypted">Chiffré: ${message.encrypted}</div>
+        <div class="message-content">Message: ${message.content}</div> <!-- Display Decrypted Content -->
+        <div class="message-encrypted">Chiffré: ${message.encrypted}</div> <!-- Display Encrypted Content -->
     `;
 
     return card;
 }
 
-function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
+// Initial load
+document.addEventListener('DOMContentLoaded', loadMessages);
+// This is where you would place subscription logic for real-time updates if needed.
 
-loadMessages();
-setInterval(loadMessages, 3000);

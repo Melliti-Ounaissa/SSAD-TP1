@@ -6,19 +6,21 @@ class AuthService:
     def __init__(self):
         self.supabase = get_supabase_client()
 
-    def sign_up(self, email, password):
+    def sign_up(self, username, password): # CHANGED email to username
         try:
             is_valid, validation_message = PasswordValidator.validate_password(password)
             if not is_valid:
                 return {"success": False, "message": "Invalid password"}
 
-            existing_user = self.supabase.table('users').select('*').eq('email', email).execute()
+            # Check for existing user by username
+            existing_user = self.supabase.table('users').select('*').eq('username', username).execute() # CHANGED email to username
 
             if existing_user.data and len(existing_user.data) > 0:
                 return {"success": False, "message": "User already exists"}
 
+            # Insert user with username
             result = self.supabase.table('users').insert({
-                "email": email,
+                "username": username, # CHANGED email to username
                 "password": password
             }).execute()
 
@@ -31,9 +33,10 @@ class AuthService:
         except Exception as e:
             return {"success": False, "message": f"Error: {str(e)}"}
 
-    def sign_in(self, email, password):
+    def sign_in(self, username, password): # CHANGED email to username
         try:
-            result = self.supabase.table('users').select('*').eq('email', email).eq('password', password).execute()
+            # Select user by username and password
+            result = self.supabase.table('users').select('*').eq('username', username).eq('password', password).execute() # CHANGED email to username
 
             if result.data and len(result.data) > 0:
                 user = result.data[0]
@@ -46,7 +49,9 @@ class AuthService:
 
     def get_all_users_except(self, user_id):
         try:
-            result = self.supabase.table('users').select('id, email').neq('id', user_id).execute()
-            return {"success": True, "users": result.data}
+            # Select username instead of email
+            result = self.supabase.table('users').select('id, username').neq('id', user_id).execute() # CHANGED email to username
+            
+            return result.data if result.data else []
         except Exception as e:
-            return {"success": False, "message": f"Error: {str(e)}"}
+            return []

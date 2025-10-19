@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 
 # --- App Initialization and Configuration ---
 
+load_dotenv() # Load .env variables
+
 # Initialize the Flask application
 # We specify the template and static folders relative to this root file.
 app = Flask(__name__,
@@ -16,13 +18,16 @@ app = Flask(__name__,
 # Enable Cross-Origin Resource Sharing (CORS) for the app
 CORS(app)
 
-app.secret_key = os.getenv('FLASK_SECRET_KEY')
-# --- Service Instantiation ---
+# SET SECRET KEY for session management (REQUIRED for 'session' variable)
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_dev_secret_key')
+
+# --- Service Instantiation ---\
 
 # Create instances of your service classes to handle business logic
 auth_service = AuthService()
-message_service = MessageService()
 crypto_service = CryptoService()
+# PASS crypto_service to MessageService for server-side decryption
+message_service = MessageService(crypto_service=crypto_service) 
 
 
 # --- Frontend Routes (Serving HTML Pages) ---
@@ -51,107 +56,127 @@ def algorithms():
     return render_template('algorithms.html', user=session['user'])
 
 
-@app.route('/encryption/<algorithm>')
-def encryption(algorithm):
-    """Page for performing encryption/decryption with a specific algorithm."""
-    if 'user' not in session:
-        return redirect(url_for('index'))
-    return render_template('encryption.html', user=session['user'], algorithm=algorithm)
-
-
 @app.route('/messages')
 def messages():
-    """Displays the user's sent and received messages."""
+    """Displays the message inbox/outbox."""
     if 'user' not in session:
         return redirect(url_for('index'))
     return render_template('messages.html', user=session['user'])
 
 
-@app.route('/logout')
-def logout():
-    """Logs the user out by clearing the session."""
-    session.pop('user', None)
-    return redirect(url_for('index'))
+@app.route('/encrypt/<algorithm>')
+def encrypt_page(algorithm):
+    """Renders the encryption page for a specific algorithm."""
+    if 'user' not in session:
+        return redirect(url_for('index'))
+    # You might want to validate the algorithm here
+    return render_template('encryption.html', user=session['user'], algorithm=algorithm)
 
 
-# --- API Endpoints ---
+# --- API Routes (Authentication) ---
 
 @app.route('/api/auth/signup', methods=['POST'])
 def signup():
-    """API endpoint for user registration."""
+    """API endpoint for user sign up."""
     data = request.json
-    email = data.get('email')
+    username = data.get('username') # CHANGED email to username
     password = data.get('password')
 
-    if not email or not password:
-        return jsonify({"success": False, "message": "Email and password are required"}), 400
+    if not username or not password:
+        return jsonify({"success": False, "message": "Username and password are required"}), 400
 
-    result = auth_service.sign_up(email, password)
+    result = auth_service.sign_up(username, password) # CHANGED email to username
 
     if result['success']:
+        # Set user session upon successful sign up
         session['user'] = result['user']
-
-    return jsonify(result), 200 if result['success'] else 400
-
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 400
 
 @app.route('/api/auth/signin', methods=['POST'])
 def signin():
-    """API endpoint for user login."""
+    """API endpoint for user sign in."""
     data = request.json
-    email = data.get('email')
+    username = data.get('username') # CHANGED email to username
     password = data.get('password')
 
-    if not email or not password:
-        return jsonify({"success": False, "message": "Email and password are required"}), 400
+    if not username or not password:
+        return jsonify({"success": False, "message": "Username and password are required"}), 400
 
-    result = auth_service.sign_in(email, password)
+    result = auth_service.sign_in(username, password) # CHANGED email to username
 
     if result['success']:
+        # Set user session upon successful sign in
         session['user'] = result['user']
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 400
 
-    return jsonify(result), 200 if result['success'] else 400
+@app.route('/api/auth/logout', methods=['POST'])
+def logout():
+    """API endpoint for user logout."""
+    session.pop('user', None)
+    return jsonify({"success": True, "message": "Logout successful"}), 200
 
+@app.route('/api/users', methods=['GET'])
+def get_users():
+    """API endpoint to get all users for recipient selection."""
+    if 'user' not in session:
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+    
+    user_id = session['user']['id']
+    users = auth_service.get_all_users_except(user_id)
 
-@app.route('/api/users/<int:user_id>/others', methods=['GET'])
-def get_other_users(user_id):
-    """API endpoint to fetch all users except the current one."""
-    result = auth_service.get_all_users_except(user_id)
-    return jsonify(result), 200 if result['success'] else 400
+    return jsonify({"success": True, "users": users}), 200
 
+# --- API Routes (Messaging) ---
 
 @app.route('/api/messages/send', methods=['POST'])
 def send_message():
-    """API endpoint to send a message to another user."""
+    """API endpoint for sending a new message."""
+    if 'user' not in session:
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+    
     data = request.json
-    sender_id = data.get('sender_id')
-    receiver_id = data.get('receiver_id')
-    content = data.get('content')
+    # Frontend must now send 'encrypted' message content, 'content' is removed
+    encrypted = data.get('encrypted')
     algo_name = data.get('algo_name')
+    receiver_id = data.get('receiver_id')
+    
+    sender_id = session['user']['id']
 
-    if not all([sender_id, receiver_id, content, algo_name]):
-        return jsonify({"success": False, "message": "Missing required fields"}), 400
+    if not all([encrypted, algo_name, receiver_id]):
+        return jsonify({"success": False, "message": "Encrypted message, algorithm, and receiver ID are required"}), 400
 
-    try:
-        encrypted = crypto_service.encrypt_message(content, algo_name)
-        result = message_service.send_message(sender_id, receiver_id, content, encrypted, algo_name)
-        return jsonify(result), 200 if result['success'] else 400
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
+    # Removed 'content' from the call
+    result = message_service.send_message(sender_id, receiver_id, encrypted, algo_name)
+
+    return jsonify(result), 200
 
 
 @app.route('/api/messages/sent/<int:user_id>', methods=['GET'])
 def get_sent_messages(user_id):
-    """API endpoint to retrieve messages sent by the user."""
+    """API endpoint to get sent messages for a user."""
+    # Basic check to ensure user is logged in and requesting their own messages
+    if 'user' not in session or session['user']['id'] != user_id:
+        return jsonify({"success": False, "message": "Unauthorized or Invalid User ID"}), 401
+
     result = message_service.get_sent_messages(user_id)
-    return jsonify(result), 200 if result['success'] else 400
+    return jsonify(result), 200
 
 
 @app.route('/api/messages/received/<int:user_id>', methods=['GET'])
 def get_received_messages(user_id):
-    """API endpoint to retrieve messages received by the user."""
-    result = message_service.get_received_messages(user_id)
-    return jsonify(result), 200 if result['success'] else 400
+    """API endpoint to get received messages for a user."""
+    # Basic check to ensure user is logged in and requesting their own messages
+    if 'user' not in session or session['user']['id'] != user_id:
+        return jsonify({"success": False, "message": "Unauthorized or Invalid User ID"}), 401
 
+    result = message_service.get_received_messages(user_id)
+    return jsonify(result), 200
+
+# --- API Routes (Cryptography) ---
 
 @app.route('/api/crypto/encrypt', methods=['POST'])
 def encrypt():
@@ -159,12 +184,15 @@ def encrypt():
     data = request.json
     message = data.get('message')
     algorithm = data.get('algorithm')
-
+    
+    # Assuming key/shift parameters are passed in 'data' as well
+    
     if not message or not algorithm:
         return jsonify({"success": False, "message": "Message and algorithm are required"}), 400
 
     try:
-        encrypted = crypto_service.encrypt_message(message, algorithm)
+        # Assuming crypto_service.encrypt_message handles all parameters including keys
+        encrypted = crypto_service.encrypt_message(message, algorithm, data) 
         return jsonify({"success": True, "encrypted": encrypted}), 200
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
@@ -181,7 +209,8 @@ def decrypt():
         return jsonify({"success": False, "message": "Encrypted message and algorithm are required"}), 400
 
     try:
-        decrypted = crypto_service.decrypt_message(encrypted_message, algorithm)
+        # Assuming crypto_service.decrypt_message handles all parameters including keys
+        decrypted = crypto_service.decrypt_message(encrypted_message, algorithm, data)
         return jsonify({"success": True, "decrypted": decrypted}), 200
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
@@ -200,10 +229,7 @@ if __name__ == '__main__':
     print("=" * 60)
     print()
     app.run(debug=True, port=5000, host='0.0.0.0')
-    
-    
-    
-    
+  
     # -*- coding: utf-8 -*-
 """
 Main application file for the Cryptography Toolkit.

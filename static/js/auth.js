@@ -1,4 +1,4 @@
-const emailInput = document.getElementById('email');
+const usernameInput = document.getElementById('username'); // CHANGED emailInput to usernameInput and id
 const passwordInput = document.getElementById('password');
 const signupBtn = document.getElementById('signup-btn');
 const signinBtn = document.getElementById('signin-btn');
@@ -25,11 +25,11 @@ function validatePasswordFormat(password) {
 }
 
 async function handleSignup() {
-    const email = emailInput.value.trim();
+    const username = usernameInput.value.trim(); // CHANGED email to username
     const password = passwordInput.value.trim();
 
-    if (!email || !password) {
-        showError('Please enter both email and password');
+    if (!username || !password) {
+        showError('Please enter both username and password'); // CHANGED email to username
         return;
     }
 
@@ -44,7 +44,7 @@ async function handleSignup() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ username, password }), // CHANGED email to username
         });
 
         const data = await response.json();
@@ -61,11 +61,11 @@ async function handleSignup() {
 }
 
 async function handleSignin() {
-    const email = emailInput.value.trim();
+    const username = usernameInput.value.trim(); // CHANGED email to username
     const password = passwordInput.value.trim();
 
-    if (!email || !password) {
-        showError('Please enter both email and password');
+    if (!username || !password) {
+        showError('Please enter both username and password'); // CHANGED email to username
         return;
     }
 
@@ -75,7 +75,7 @@ async function handleSignin() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ username, password }), // CHANGED email to username
         });
 
         const data = await response.json();
@@ -93,9 +93,3 @@ async function handleSignin() {
 
 signupBtn.addEventListener('click', handleSignup);
 signinBtn.addEventListener('click', handleSignin);
-
-passwordInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        handleSignin();
-    }
-});
