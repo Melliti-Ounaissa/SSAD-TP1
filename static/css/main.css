@@ -414,3 +414,221 @@ body {
         font-size: 1.8rem;
     }
 }
+
+.conversation-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.conversation-header h2 {
+    color: #0d214f;
+    font-size: 1.8rem;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 200px);
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.messages-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.message-bubble {
+    max-width: 70%;
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    border-radius: 20px;
+    position: relative;
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message-bubble.sent {
+    background-color: #0d214f;
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 5px;
+}
+
+.message-bubble.received {
+    background-color: #f0f5ff;
+    color: #333;
+    margin-right: auto;
+    border-bottom-left-radius: 5px;
+}
+
+.message-info {
+    font-size: 0.75rem;
+    margin-bottom: 5px;
+    opacity: 0.8;
+}
+
+.message-text {
+    word-wrap: break-word;
+    margin: 8px 0;
+    font-size: 1rem;
+}
+
+.message-text.encrypted {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    font-style: italic;
+    cursor: pointer;
+    border: 1px dashed rgba(255,255,255,0.3);
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.message-bubble.received .message-text.encrypted {
+    border-color: #0d214f;
+}
+
+.message-meta {
+    font-size: 0.7rem;
+    margin-top: 8px;
+    opacity: 0.7;
+}
+
+.decrypt-btn {
+    background-color: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.3s;
+}
+
+.message-bubble.received .decrypt-btn {
+    background-color: #0d214f;
+    color: white;
+    border-color: #0d214f;
+}
+
+.decrypt-btn:hover {
+    transform: scale(1.05);
+}
+
+.message-input-area {
+    border-top: 2px solid #e0e0e0;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.algorithm-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.algorithm-selector label {
+    font-weight: bold;
+    color: #333;
+}
+
+.algorithm-selector select {
+    padding: 8px 15px;
+    border: 2px solid #d0d0d0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+}
+
+.key-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.key-inputs label {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.key-inputs input {
+    padding: 6px 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    width: 100px;
+}
+
+#message-input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #d0d0d0;
+    border-radius: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 1rem;
+    resize: none;
+}
+
+#message-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+}
+
+.conversation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.conversation-item {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.conversation-item:hover {
+    border-color: #0d214f;
+    transform: translateX(5px);
+}
+
+.conversation-header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.conversation-username {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #0d214f;
+}
+
+.conversation-time {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.conversation-preview {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.conversation-preview .encrypted {
+    font-family: 'Courier New', monospace;
+    font-style: italic;
+    opacity: 0.8;
+}

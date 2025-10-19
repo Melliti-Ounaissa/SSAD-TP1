@@ -1,4 +1,4 @@
-const usernameInput = document.getElementById('username'); // CHANGED emailInput to usernameInput and id
+const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
 const signupBtn = document.getElementById('signup-btn');
 const signinBtn = document.getElementById('signin-btn');
@@ -25,11 +25,11 @@ function validatePasswordFormat(password) {
 }
 
 async function handleSignup() {
-    const username = usernameInput.value.trim(); // CHANGED email to username
+    const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
 
     if (!username || !password) {
-        showError('Please enter both username and password'); // CHANGED email to username
+        showError('Please enter both username and password');
         return;
     }
 
@@ -44,7 +44,7 @@ async function handleSignup() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, password }), // CHANGED email to username
+            body: JSON.stringify({ username, password }),
         });
 
         const data = await response.json();
@@ -61,11 +61,11 @@ async function handleSignup() {
 }
 
 async function handleSignin() {
-    const username = usernameInput.value.trim(); // CHANGED email to username
+    const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
 
     if (!username || !password) {
-        showError('Please enter both username and password'); // CHANGED email to username
+        showError('Please enter both username and password');
         return;
     }
 
@@ -75,7 +75,7 @@ async function handleSignin() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, password }), // CHANGED email to username
+            body: JSON.stringify({ username, password }),
         });
 
         const data = await response.json();
@@ -93,3 +93,9 @@ async function handleSignin() {
 
 signupBtn.addEventListener('click', handleSignup);
 signinBtn.addEventListener('click', handleSignin);
+
+passwordInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        handleSignin();
+    }
+});

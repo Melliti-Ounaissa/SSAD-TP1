@@ -1,83 +1,76 @@
-const sentMessagesList = document.getElementById('sent-messages');
-const receivedMessagesList = document.getElementById('received-messages');
+const conversationList = document.getElementById('conversation-list');
 
-// Helper to capitalize the first letter of a string
-function capitalizeFirst(str) {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-async function loadMessages() {
+async function loadConversations() {
     try {
-        // userId is defined in messages.html script block
-        const [sentResponse, receivedResponse] = await Promise.all([
-            fetch(`/api/messages/sent/${userId}`),
-            fetch(`/api/messages/received/${userId}`)
-        ]);
+        const response = await fetch('/api/messages/all');
+        const data = await response.json();
 
-        const sentData = await sentResponse.json();
-        const receivedData = await receivedResponse.json();
-
-        displaySentMessages(sentData.messages || []);
-        displayReceivedMessages(receivedData.messages || []);
+        if (data.success && data.messages) {
+            displayConversations(data.messages);
+        }
     } catch (error) {
-        console.error('Error loading messages:', error);
+        console.error('Error loading conversations:', error);
     }
 }
 
-function displaySentMessages(messages) {
-    if (messages.length === 0) {
-        sentMessagesList.innerHTML = '<p class="no-messages">Aucun message envoyé</p>';
+function displayConversations(messages) {
+    const conversations = {};
+
+    messages.forEach(message => {
+        const otherUserId = message.sender_id === userId ? message.receiver_id : message.sender_id;
+        const otherUsername = message.sender_id === userId
+            ? message.receiver.username
+            : message.sender.username;
+
+        if (!conversations[otherUserId]) {
+            conversations[otherUserId] = {
+                userId: otherUserId,
+                username: otherUsername,
+                lastMessage: message,
+                messages: []
+            };
+        }
+
+        conversations[otherUserId].messages.push(message);
+        if (new Date(message.date_created) > new Date(conversations[otherUserId].lastMessage.date_created)) {
+            conversations[otherUserId].lastMessage = message;
+        }
+    });
+
+    if (Object.keys(conversations).length === 0) {
+        conversationList.innerHTML = '<p class="no-messages">Aucune conversation</p>';
         return;
     }
 
-    sentMessagesList.innerHTML = '';
-    messages.forEach(message => {
-        const card = createMessageCard(message, true);
-        sentMessagesList.appendChild(card);
+    conversationList.innerHTML = '';
+    Object.values(conversations).forEach(conv => {
+        const item = createConversationItem(conv);
+        conversationList.appendChild(item);
     });
 }
 
-function displayReceivedMessages(messages) {
-    if (messages.length === 0) {
-        receivedMessagesList.innerHTML = '<p class="no-messages">Aucun message reçu</p>';
-        return;
-    }
+function createConversationItem(conversation) {
+    const div = document.createElement('div');
+    div.className = 'conversation-item';
+    div.onclick = () => window.location.href = `/conversation/${conversation.userId}`;
 
-    receivedMessagesList.innerHTML = '';
-    messages.forEach(message => {
-        const card = createMessageCard(message, false);
-        receivedMessagesList.appendChild(card);
-    });
-}
+    const date = new Date(conversation.lastMessage.date_created).toLocaleString('fr-FR');
+    const preview = conversation.lastMessage.encrypted.substring(0, 50) + '...';
+    const direction = conversation.lastMessage.sender_id === userId ? 'Sent' : 'Received';
 
-function createMessageCard(message, isSent) {
-    const card = document.createElement('div');
-    card.className = 'message-card';
-
-    // CHANGED 'email' to 'username' in the message object access
-    const recipientUsername = isSent
-        ? (message.users?.username || 'Unknown') // For sent messages, this is the recipient's username
-        : (message.users?.username || 'Unknown'); // For received messages, this is the sender's username
-
-    const headerText = isSent ? `À: ${recipientUsername}` : `De: ${recipientUsername}`; 
-    const date = new Date(message.date_created).toLocaleString('fr-FR');
-    
-    // message.content is now the decrypted message (added by server)
-    // message.encrypted is the original crypted message (from DB)
-
-    card.innerHTML = `
-        <div class="message-header">${headerText}</div>
-        <div class="message-meta">Algorithme: ${capitalizeFirst(message.algo_name)}</div>
-        <div class="message-meta">Date: ${date}</div>
-        <div class="message-content">Message: ${message.content}</div> <!-- Display Decrypted Content -->
-        <div class="message-encrypted">Chiffré: ${message.encrypted}</div> <!-- Display Encrypted Content -->
+    div.innerHTML = `
+        <div class="conversation-header-info">
+            <span class="conversation-username">${conversation.username}</span>
+            <span class="conversation-time">${date}</span>
+        </div>
+        <div class="conversation-preview">
+            <strong>${direction}:</strong>
+            <span class="encrypted">${preview}</span>
+        </div>
     `;
 
-    return card;
+    return div;
 }
 
-// Initial load
-document.addEventListener('DOMContentLoaded', loadMessages);
-// This is where you would place subscription logic for real-time updates if needed.
-
+loadConversations();
+setInterval(loadConversations, 3000);

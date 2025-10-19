@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Toolkit - Welcome</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="hero-section">
+            <div class="logo">🔐</div>
+            <h1>Boîte à outils de<br>cryptographie classique</h1>
+            <p class="subtitle">Explorez les algorithmes de cryptographie classique et échangez des messages cryptés en temps réel</p>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="window.location.href='/auth'">
+                    Sign In
+                </button>
+                <button class="btn btn-secondary" onclick="window.location.href='/auth'">
+                    Sign Up
+                </button>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📧</div>
+                <h3>Messagerie</h3>
+                <p>Échangez des messages chiffrés avec d'autres utilisateurs</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🧠</div>
+                <h3>Algorithmes</h3>
+                <p>Caesar, Affine, Hill, Playfair</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔑</div>
+                <h3>Clés personnalisées</h3>
+                <p>Utilisez vos propres clés pour plus de sécurité</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

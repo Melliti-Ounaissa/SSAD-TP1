@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cryptography Toolkit - Messages</title>
+    <title>Messages</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
@@ -20,30 +20,18 @@
                     <span class="nav-icon">🧠</span>
                     <span class="nav-text">Algorithmes<br>de Cryptage</span>
                 </a>
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">⚔️</span>
-                    <span class="nav-text">Attaques</span>
-                </a>
             </nav>
+
+            <div class="sidebar-footer">
+                <a href="/logout" class="logout-link">Se déconnecter</a>
+            </div>
         </aside>
 
         <main class="main-content">
-            <h1 class="page-title">Messages</h1>
+            <h1 class="page-title">Conversations</h1>
 
-            <div class="messages-container">
-                <div class="messages-column">
-                    <h2 class="column-title">Messages Envoyés</h2>
-                    <div class="messages-list" id="sent-messages">
-                        <p class="no-messages">Aucun message envoyé</p>
-                    </div>
-                </div>
-
-                <div class="messages-column">
-                    <h2 class="column-title">Messages Reçus</h2>
-                    <div class="messages-list" id="received-messages">
-                        <p class="no-messages">Aucun message reçu</p>
-                    </div>
-                </div>
+            <div class="conversation-list" id="conversation-list">
+                <p class="no-messages">Chargement...</p>
             </div>
         </main>
     </div>
