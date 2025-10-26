@@ -1,8 +1,12 @@
 from crypto_algos.algos.ceasare import caesar_encrypt, caesar_decrypt
 from crypto_algos.algos.affine import affine_encrypt, affine_decrypt
 # MODIFIED IMPORTS
+from crypto_algos.algos.ceasare import caesar_encrypt, caesar_decrypt
+from crypto_algos.algos.affine import affine_encrypt, affine_decrypt
+# MODIFIED IMPORTS
 from crypto_algos.algos.hill import hill_encrypt, hill_decrypt, generate_key_matrix, restore_spaces
-from crypto_algos.algos.playfair import playfair_encrypt, playfair_decrypt
+# NEW PLAYFAIR IMPORTS
+from crypto_algos.algos.playfair import Playfair, PlayfairError
 import json
 import math  # IMPORT MATH
 
@@ -45,8 +49,17 @@ class CryptoService:
                 raise ValueError(f"Hill key error: {e}")
 
         elif algo == "playfair":
+            # MODIFIED PLAYFAIR ENCRYPTION LOGIC
             key = key_params.get('key', 'MONARCHY') if key_params else 'MONARCHY'
-            return playfair_encrypt(message, key=key)
+            try:
+                cipher = Playfair()
+                cipher.setPassword(key)
+                # Use encryptWithCase to preserve spaces and punctuation
+                return cipher.encryptWithCase(message)
+            except PlayfairError as e:
+                raise ValueError(f"Playfair key/encryption error: {e}")
+            except Exception as e:
+                raise ValueError(f"Playfair error: {e}")
 
         else:
             raise ValueError(f"Unknown algorithm: {algorithm}")
@@ -88,8 +101,17 @@ class CryptoService:
                 raise ValueError(f"Hill key/decryption error: {e}")
 
         elif algo == "playfair":
+            # MODIFIED PLAYFAIR DECRYPTION LOGIC
             key = key_params.get('key', 'MONARCHY') if key_params else 'MONARCHY'
-            return playfair_decrypt(encrypted_message, key=key)
+            try:
+                cipher = Playfair()
+                cipher.setPassword(key)
+                # Use decryptWithCase to correctly handle spaces and punctuation
+                return cipher.decryptWithCase(encrypted_message)
+            except PlayfairError as e:
+                raise ValueError(f"Playfair key/decryption error: {e}")
+            except Exception as e:
+                raise ValueError(f"Playfair error: {e}")
 
         else:
             raise ValueError(f"Unknown algorithm: {algorithm}")
