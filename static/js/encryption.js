@@ -60,9 +60,14 @@ function createKeyInputs() {
             `;
             break;
         case 'hill':
+            // MODIFIED HILL INPUT
             html = `
                 <div class="key-input-group">
-                    <p style="color: #666; font-size: 0.9rem;">Hill utilise une matrice 3x3 par défaut</p>
+                    <label>Key (longueur 4, 9, 16...):</label>
+                    <input type="text" id="hill-key" value="FRID">
+                </div>
+                <div class="key-input-group">
+                    <p style="color: #666; font-size: 0.9rem;">Clé pour matrice $n \\times n$. Doit être invertible mod 27. (Ex: "FRID" pour 2x2)</p>
                 </div>
             `;
             break;
@@ -89,11 +94,13 @@ function getKeyParams() {
             params.b = bInput ? parseInt(bInput.value) : 8;
             break;
         case 'playfair':
-            const keyInput = document.getElementById('playfair-key');
-            params.key = keyInput ? keyInput.value : 'MONARCHY';
+            const playfairKeyInput = document.getElementById('playfair-key');
+            params.key = playfairKeyInput ? playfairKeyInput.value : 'MONARCHY';
             break;
         case 'hill':
-            // Hill uses default matrix
+            // MODIFIED HILL KEY PARAM
+            const keyInput = document.getElementById('hill-key');
+            params.key = keyInput ? keyInput.value.trim() : 'FRID';
             break;
     }
     
