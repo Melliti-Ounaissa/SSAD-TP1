@@ -6,6 +6,9 @@ const keyInputsDiv = document.getElementById('key-inputs');
 
 let otherUsername = '';
 
+// Store timers for auto-hide functionality
+const decryptTimers = {};
+
 function updateKeyInputs() {
     const algorithm = algorithmSelect.value;
     let html = '';
@@ -80,6 +83,7 @@ function createMessageElement(message) {
     const isSent = message.sender_id === currentUserId;
     const div = document.createElement('div');
     div.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
+    div.dataset.messageId = message.id;
 
     const sender = isSent ? 'You' : message.sender.username;
     const date = new Date(message.date_created).toLocaleString('fr-FR');
@@ -99,6 +103,13 @@ async function decryptMessage(button) {
     const encrypted = messageText.dataset.encrypted;
     const algorithm = messageText.dataset.algo;
     const keyParams = JSON.parse(messageText.dataset.key || '{}');
+    const messageBubble = button.closest('.message-bubble');
+    const messageId = messageBubble.dataset.messageId;
+
+    // Clear any existing timer for this message
+    if (decryptTimers[messageId]) {
+        clearTimeout(decryptTimers[messageId]);
+    }
 
     try {
         const response = await fetch('/api/crypto/decrypt', {
@@ -114,9 +125,18 @@ async function decryptMessage(button) {
         const data = await response.json();
 
         if (data.success) {
+            const originalEncrypted = messageText.textContent;
             messageText.textContent = data.decrypted;
             messageText.classList.remove('encrypted');
             button.style.display = 'none';
+
+            // Set timer to hide decrypted message after 1 minute (60 seconds)
+            decryptTimers[messageId] = setTimeout(() => {
+                messageText.textContent = originalEncrypted;
+                messageText.classList.add('encrypted');
+                button.style.display = 'inline-block';
+                delete decryptTimers[messageId];
+            }, 60000); // 60000ms = 60 seconds = 1 minute
         } else {
             alert('Decryption error: ' + data.message);
         }

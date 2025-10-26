@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stéganographie Audio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .stego-section {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .stego-section h2 {
+            color: #0d214f;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .upload-area {
+            border: 3px dashed #d0d0d0;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: #4a90e2;
+            background-color: #f8f9fa;
+        }
+        
+        .upload-area input[type="file"] {
+            display: none;
+        }
+        
+        .upload-label {
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .file-info {
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .message-input-stego {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 2px solid #d0d0d0;
+            border-radius: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            resize: vertical;
+        }
+        
+        .stego-messages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .stego-message-card {
+            background-color: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .stego-message-card:hover {
+            border-color: #0d214f;
+        }
+        
+        .stego-message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .stego-message-from {
+            font-weight: bold;
+            color: #0d214f;
+        }
+        
+        .stego-message-date {
+            color: #999;
+            font-size: 0.85rem;
+        }
+        
+        .decrypt-audio-btn {
+            background-color: #0d214f;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .decrypt-audio-btn:hover {
+            background-color: #1a3a7a;
+        }
+        
+        .decrypted-content {
+            background-color: #e6f0ff;
+            border-left: 4px solid #0d214f;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .decrypted-content.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <button class="back-button" onclick="window.location.href='/home'">←</button>
+
+            <nav class="nav-menu">
+                <a href="/messages" class="nav-item">
+                    <span class="nav-icon">📧</span>
+                    <span class="nav-text">Messages</span>
+                </a>
+                <a href="/algorithms" class="nav-item">
+                    <span class="nav-icon">🧠</span>
+                    <span class="nav-text">Algorithmes<br>de Cryptage</span>
+                </a>
+                <a href="/steganography" class="nav-item active">
+                    <span class="nav-icon">🎵</span>
+                    <span class="nav-text">Stéganographie</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="/logout" class="logout-link">Se déconnecter</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <h1 class="page-title">🎵 Stéganographie Audio</h1>
+
+            <!-- Send Audio Message Section -->
+            <div class="stego-section">
+                <h2>📤 Envoyer un message audio caché</h2>
+                
+                <div class="upload-area" id="upload-area">
+                    <label for="audio-file" class="upload-label">
+                        <div class="upload-icon">🎵</div>
+                        <p><strong>Cliquez pour sélectionner un fichier audio WAV</strong></p>
+                        <p style="font-size: 0.9rem; color: #999;">ou glissez-déposez ici</p>
+                    </label>
+                    <input type="file" id="audio-file" accept=".wav" />
+                    <div class="file-info" id="file-info"></div>
+                </div>
+
+                <textarea 
+                    id="secret-message" 
+                    class="message-input-stego" 
+                    placeholder="Entrez votre message secret à cacher dans l'audio...">
+                </textarea>
+
+                <div class="send-section">
+                    <div class="recipient-select">
+                        <label>Destinataire:</label>
+                        <select id="stego-recipient-select" class="recipient-dropdown">
+                            <option value="">Choisir un destinataire...</option>
+                        </select>
+                    </div>
+                    <button class="btn-send" onclick="sendStegoMessage()">Envoyer</button>
+                </div>
+
+                <div class="error-message" id="send-error-message"></div>
+            </div>
+
+            <!-- Received Audio Messages Section -->
+            <div class="stego-section">
+                <h2>📥 Messages audio reçus</h2>
+                <div class="stego-messages-list" id="stego-messages-list">
+                    <p class="no-messages">Chargement...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const userId = {{ user.id }};
+    </script>
+    <script src="{{ url_for('static', filename='js/steganography.js') }}"></script>
+</body>
+</html>

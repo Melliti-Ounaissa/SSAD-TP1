@@ -20,6 +20,10 @@
                     <span class="nav-icon">🧠</span>
                     <span class="nav-text">Algorithmes<br>de Cryptage</span>
                 </a>
+                <a href="/steganography" class="nav-item">
+                    <span class="nav-icon">🎵</span>
+                    <span class="nav-text">Stéganographie</span>
+                </a>
             </nav>
 
             <div class="sidebar-footer">
@@ -63,6 +67,8 @@
     <script>
         const currentUserId = {{ user.id }};
         const otherUserId = {{ other_user_id }};
+        // Auto-hide decrypted messages after 1 minute
+        const DECRYPT_DISPLAY_TIME = 60000; // 60 seconds = 1 minute
     </script>
     <script src="{{ url_for('static', filename='js/conversation.js') }}"></script>
 </body>

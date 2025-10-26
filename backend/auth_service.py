@@ -44,7 +44,17 @@ class AuthService:
         except Exception as e:
             return {"success": False, "message": f"Error: {str(e)}"}
 
+    def get_all_users(self):
+        """Get all users including current user"""
+        try:
+            result = self.supabase.table('users').select('id, username').execute()
+            return result.data if result.data else []
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            return []
+
     def get_all_users_except(self, user_id):
+        """Get all users except specified user (kept for backward compatibility)"""
         try:
             result = self.supabase.table('users').select('id, username').neq('id', user_id).execute()
             return result.data if result.data else []
