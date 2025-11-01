@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file, Response
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file
 from flask_cors import CORS
 from backend.auth_service import AuthService
 from backend.message_service import MessageService
@@ -94,11 +94,6 @@ def steganography_page():
 def logout():
     session.clear()
     return redirect(url_for('index'))
-
-
-@app.route('/favicon.ico')
-def favicon():
-    return '', 204
 
 
 @app.route('/api/auth/signup', methods=['POST'])
@@ -256,11 +251,45 @@ def send_stego_message():
 
     try:
         sender_id = session['user']['id']
-        result = stego_service.hide_message_and_save(
-            file, secret_message, sender_id, receiver_id, app.config['UPLOAD_FOLDER']
+        
+        # Validate WAV file before processing
+        temp_path = os.path.join(app.config['UPLOAD_FOLDER'], f'temp_{sender_id}.wav')
+        file.save(temp_path)
+        
+        # Check if it's a valid WAV file
+        try:
+            import wave
+            with wave.open(temp_path, 'rb') as wav:
+                frames = wav.getnframes()
+                rate = wav.getframerate()
+                duration = frames / float(rate)
+                print(f"Audio file validated: {duration:.2f} seconds, {frames} frames")
+                
+                # Ensure audio is long enough for message
+                message_bits = len(secret_message + "###END###") * 8
+                if frames < message_bits:
+                    os.remove(temp_path)
+                    return jsonify({
+                        "success": False, 
+                        "message": f"Audio too short! Need at least {message_bits} samples for this message. Audio has {frames} samples."
+                    }), 400
+        except wave.Error as e:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            return jsonify({"success": False, "message": f"Invalid WAV file: {str(e)}"}), 400
+        
+        # Process with steganography
+        result = stego_service.hide_message_and_save_from_temp(
+            temp_path, secret_message, sender_id, receiver_id, app.config['UPLOAD_FOLDER']
         )
+        
+        # Clean up temp file
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        
         return jsonify(result), 200
     except Exception as e:
+        print(f"Error in stego send: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
 
 
@@ -291,52 +320,18 @@ def serve_audio(filename):
     
     try:
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        if not os.path.exists(file_path):
+        if os.path.exists(file_path):
+            return send_file(
+                file_path, 
+                mimetype='audio/wav',
+                as_attachment=False,
+                download_name=filename,
+                conditional=True,
+                max_age=0
+            )
+        else:
             return jsonify({"success": False, "message": "File not found"}), 404
-        
-        # Get file size
-        file_size = os.path.getsize(file_path)
-        
-        # Check if range header is present
-        range_header = request.headers.get('Range', None)
-        
-        if not range_header:
-            # No range requested, send entire file
-            with open(file_path, 'rb') as f:
-                data = f.read()
-            
-            response = Response(data, 200, mimetype='audio/wav', direct_passthrough=True)
-            response.headers.add('Content-Length', str(file_size))
-            response.headers.add('Accept-Ranges', 'bytes')
-            return response
-        
-        # Parse range header
-        byte_range = range_header.replace('bytes=', '').split('-')
-        start = int(byte_range[0]) if byte_range[0] else 0
-        end = int(byte_range[1]) if byte_range[1] else file_size - 1
-        
-        # Ensure valid range
-        if start >= file_size or end >= file_size:
-            return Response('Requested Range Not Satisfiable', 416)
-        
-        length = end - start + 1
-        
-        # Read the requested range
-        with open(file_path, 'rb') as f:
-            f.seek(start)
-            data = f.read(length)
-        
-        # Create response with partial content
-        response = Response(data, 206, mimetype='audio/wav', direct_passthrough=True)
-        response.headers.add('Content-Length', str(length))
-        response.headers.add('Content-Range', f'bytes {start}-{end}/{file_size}')
-        response.headers.add('Accept-Ranges', 'bytes')
-        response.headers.add('Cache-Control', 'no-cache')
-        
-        return response
-        
     except Exception as e:
-        print(f"Error serving audio: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
 
 

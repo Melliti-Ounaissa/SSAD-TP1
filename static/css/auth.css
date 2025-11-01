@@ -6,7 +6,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  font-family: "Poppins", "Segoe UI", sans-serif;
 }
 
 /* Fond animé */
@@ -19,10 +19,19 @@ body {
   align-items: center;
   justify-content: center;
 }
+
 @keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Container principal */
@@ -35,7 +44,7 @@ body {
   border-radius: 25px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Section gauche (formulaire) */
@@ -56,17 +65,32 @@ h1 {
   background: linear-gradient(90deg, #b8f1ff, #e0b8ff, #fff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 12px rgba(255,255,255,0.25);
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
   animation: textPulse 3s infinite ease-in-out;
 }
+
 @keyframes textPulse {
-  0%, 100% { opacity: 0.9; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
-  50% { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,0.6); }
+
+  0%,
+  100% {
+    opacity: 0.9;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  }
+
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+  }
 }
 
-/* Champs d’entrée */
+/* Champs d'entrée */
 .input-group {
   margin-bottom: 20px;
+}
+
+/* Enhanced password input group styling with modern eye icon */
+.password-input-group {
+  position: relative;
 }
 
 input {
@@ -77,8 +101,12 @@ input {
   font-size: 1rem;
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
-  box-shadow: inset 0 0 8px rgba(255,255,255,0.1);
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
+}
+
+.password-input-group input {
+  padding-right: 50px;
 }
 
 input::placeholder {
@@ -87,9 +115,45 @@ input::placeholder {
 
 input:focus {
   outline: none;
-  background: rgba(255,255,255,0.25);
-  box-shadow: 0 0 10px rgba(76,201,240,0.6);
-  border: 1px solid rgba(76,201,240,0.7);
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 10px rgba(76, 201, 240, 0.6);
+  border: 1px solid rgba(76, 201, 240, 0.7);
+}
+
+/* Modern SVG eye icon button with smooth transitions and hover effects */
+.toggle-password-btn {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.toggle-password-btn:hover {
+  color: rgba(255, 255, 255, 1);
+  background: rgba(76, 201, 240, 0.15);
+  box-shadow: 0 0 12px rgba(76, 201, 240, 0.3);
+}
+
+.toggle-password-btn:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+.toggle-password-btn svg {
+  width: 20px;
+  height: 20px;
+  transition: all 0.3s ease;
 }
 
 /* Astuces mot de passe */
@@ -111,7 +175,7 @@ input:focus {
   margin-bottom: 8px;
 }
 
-/* Message d’erreur */
+/* Message d'erreur */
 .error-message {
   color: #ff6ec7;
   font-weight: 500;
@@ -143,27 +207,29 @@ input:focus {
 .btn-primary {
   background: linear-gradient(90deg, #3a0ca3, #4cc9f0);
   color: white;
-  box-shadow: 0 0 20px rgba(72,191,227,0.4);
+  box-shadow: 0 0 20px rgba(72, 191, 227, 0.4);
 }
+
 .btn-primary:hover {
   transform: translateY(-4px);
-  box-shadow: 0 0 25px rgba(72,191,227,0.8);
+  box-shadow: 0 0 25px rgba(72, 191, 227, 0.8);
 }
 
 .btn-secondary {
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
+
 .btn-secondary:hover {
-  background: rgba(255,255,255,0.3);
-  box-shadow: 0 0 15px rgba(255,255,255,0.4);
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
 }
 
 /* Section droite (illustration) */
 .right-section {
   flex: 1;
-  background: linear-gradient(160deg, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
   backdrop-filter: blur(20px);
   display: flex;
   align-items: center;
@@ -180,12 +246,20 @@ input:focus {
 .lock-icon {
   font-size: 6rem;
   color: #4cc9f0;
-  text-shadow: 0 0 15px rgba(76,201,240,0.6);
+  text-shadow: 0 0 15px rgba(76, 201, 240, 0.6);
   animation: float 3s ease-in-out infinite;
 }
+
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 .security-illustration p {
@@ -202,12 +276,15 @@ input:focus {
     flex-direction: column;
     width: 95%;
   }
+
   .right-section {
     display: none;
   }
+
   .left-section {
     padding: 40px 30px;
   }
+
   h1 {
     font-size: 2rem;
   }

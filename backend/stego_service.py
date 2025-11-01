@@ -10,8 +10,57 @@ class StegoService:
     def __init__(self):
         self.supabase = get_supabase_client()
 
+    def hide_message_and_save_from_temp(self, temp_path, secret_message, sender_id, receiver_id, upload_folder):
+        """Hide message in audio from temporary file and save to database"""
+        try:
+            # Generate unique filename
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            output_filename = f"stego_{sender_id}_{timestamp}.wav"
+            output_path = os.path.join(upload_folder, output_filename)
+
+            # Hide message in audio
+            hide_in_audio(temp_path, secret_message, output_path)
+
+            # Verify output file was created and is valid
+            if not os.path.exists(output_path):
+                return {"success": False, "message": "Failed to create steganography file"}
+            
+            # Verify output file integrity
+            import wave
+            try:
+                with wave.open(output_path, 'rb') as wav:
+                    frames = wav.getnframes()
+                    if frames == 0:
+                        os.remove(output_path)
+                        return {"success": False, "message": "Generated audio file is empty"}
+            except Exception as e:
+                if os.path.exists(output_path):
+                    os.remove(output_path)
+                return {"success": False, "message": f"Generated audio file is corrupted: {str(e)}"}
+
+            # Save to database
+            message_data = {
+                "sender_id": sender_id,
+                "receiver_id": receiver_id,
+                "audio_filename": output_filename,
+                "date_created": datetime.now().isoformat()
+            }
+
+            result = self.supabase.table('stego_messages').insert(message_data).execute()
+
+            if result.data and len(result.data) > 0:
+                return {"success": True, "message": "Steganography message sent successfully", "data": result.data[0]}
+            else:
+                # Clean up file if database save failed
+                if os.path.exists(output_path):
+                    os.remove(output_path)
+                return {"success": False, "message": "Failed to save message to database"}
+
+        except Exception as e:
+            return {"success": False, "message": f"Error: {str(e)}"}
+
     def hide_message_and_save(self, audio_file, secret_message, sender_id, receiver_id, upload_folder):
-        """Hide message in audio and save to database"""
+        """Hide message in audio and save to database (legacy method)"""
         try:
             # Generate unique filenames
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")

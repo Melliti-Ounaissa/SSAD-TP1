@@ -215,4 +215,3 @@ messageInput.addEventListener('keypress', (e) => {
 });
 
 loadConversation();
-setInterval(loadConversation, 3000);

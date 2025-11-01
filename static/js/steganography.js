@@ -245,4 +245,3 @@ function showError(message, type = 'error') {
 // Initialize
 loadRecipients();
 loadStegoMessages();
-setInterval(loadStegoMessages, 5000);

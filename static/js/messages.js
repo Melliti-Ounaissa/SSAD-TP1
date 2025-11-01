@@ -73,4 +73,3 @@ function createConversationItem(conversation) {
 }
 
 loadConversations();
-setInterval(loadConversations, 3000);
