@@ -1,5 +1,4 @@
 from crypto_algos.algos.ceasare import caesar_encrypt, caesar_decrypt
-from crypto_algos.algos.affine import affine_encrypt, affine_decrypt
 from crypto_algos.algos.hill import hill_encrypt_bytes, hill_decrypt_bytes
 from crypto_algos.algos.hill import matrix_mod_inv # You'll need this to check key invertibility
 from crypto_algos.algos.playfair import Playfair, PlayfairError
@@ -16,14 +15,6 @@ class CryptoService:
         if algo == "ceasar":
             shift = int(key_params.get('shift', 3)) if key_params else 3
             return caesar_encrypt(message, shift=shift)
-
-        elif algo == "affine":
-            if key_params:
-                a = int(key_params.get('a', 5))
-                b = int(key_params.get('b', 8))
-            else:
-                a, b = 5, 8
-            return affine_encrypt(message, a=a, b=b)
 
         elif algo == "hill":
             key = key_params.get('key', 'FRID') if key_params else 'FRID'
@@ -79,14 +70,6 @@ class CryptoService:
         if algo == "ceasar":
             shift = int(key_params.get('shift', 3)) if key_params else 3
             return caesar_decrypt(encrypted_message, shift=shift)
-
-        elif algo == "affine":
-            if key_params:
-                a = int(key_params.get('a', 5))
-                b = int(key_params.get('b', 8))
-            else:
-                a, b = 5, 8
-            return affine_decrypt(encrypted_message, a=a, b=b)
 
         elif algo == "hill":
             key = key_params.get('key', 'FRID') if key_params else 'FRID'
