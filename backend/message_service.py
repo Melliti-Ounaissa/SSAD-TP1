@@ -28,10 +28,12 @@ class MessageService:
                 return {"success": False, "message": "Failed to send message"}
 
         except Exception as e:
+            print(f"Error sending message: {str(e)}")
             return {"success": False, "message": f"Error: {str(e)}"}
 
     def get_conversation(self, user1_id, user2_id):
         try:
+            # Query messages between two users with proper joins
             result = self.supabase.table('messages').select(
                 '''
                 id,
@@ -48,9 +50,16 @@ class MessageService:
                 f'and(sender_id.eq.{user1_id},receiver_id.eq.{user2_id}),and(sender_id.eq.{user2_id},receiver_id.eq.{user1_id})'
             ).order('date_created', desc=False).execute()
 
-            return {"success": True, "messages": result.data if result.data else []}
+            messages = result.data if result.data else []
+            
+            # Debug: Print to console
+            print(f"Loading conversation between {user1_id} and {user2_id}")
+            print(f"Found {len(messages)} messages")
+            
+            return {"success": True, "messages": messages}
         except Exception as e:
-            return {"success": False, "message": f"Error: {str(e)}"}
+            print(f"Error loading conversation: {str(e)}")
+            return {"success": False, "message": f"Error: {str(e)}", "messages": []}
 
     def get_all_conversations(self, user_id):
         try:
@@ -72,6 +81,7 @@ class MessageService:
 
             return {"success": True, "messages": result.data if result.data else []}
         except Exception as e:
+            print(f"Error getting all conversations: {str(e)}")
             return {"success": False, "message": f"Error: {str(e)}"}
 
     def get_sent_messages(self, user_id):

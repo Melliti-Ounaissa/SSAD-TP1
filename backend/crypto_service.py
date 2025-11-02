@@ -1,10 +1,17 @@
 from crypto_algos.algos.ceasare import caesar_encrypt, caesar_decrypt
-from crypto_algos.algos.hill import hill_encrypt_bytes, hill_decrypt_bytes
-from crypto_algos.algos.hill import matrix_mod_inv # You'll need this to check key invertibility
+# --- CORRIGÉ ---
+# Importer les fonctions qui existent réellement dans votre hill.py
+from crypto_algos.algos.hill import (
+    hill_encrypt, 
+    hill_decrypt, 
+    generate_key_matrix, 
+    restore_spaces
+)
+# --- FIN CORRECTION ---
 from crypto_algos.algos.playfair import Playfair, PlayfairError
 import json
-import math  # IMPORT MATH
-import numpy as np # You'll need this for key matrix creation
+import math
+import numpy as np
 
 
 class CryptoService:
@@ -27,26 +34,23 @@ class CryptoService:
             if n * n != key_len:
                 raise ValueError(f"Hill key length must be a perfect square (4, 9, 16...). Got length {key_len}")
 
-            # --- NEW LOGIC TO CREATE KEY MATRIX ---
             try:
-                key_bytes = key.encode('utf-8')
-                if len(key_bytes) != n * n:
-                    raise ValueError(f"Key encoded as utf-8 must be exactly {n*n} bytes long")
-                key_matrix = np.array([list(key_bytes[i*n:(i+1)*n]) for i in range(n)], dtype=int)
-                # You might need to check invertibility here, or let hill_encrypt_bytes handle it
+                # --- CORRIGÉ ---
+                # Utiliser la fonction de génération de matrice de hill.py
+                key_matrix = generate_key_matrix(key, n)
 
-                # Use the existing function name
-                return hill_encrypt_bytes(message, key_matrix)
+                # Appeler la fonction d'encryptage correcte
+                # 'preserve_case=True' correspond à la logique de votre hill.py
+                return hill_encrypt(message, key_matrix, n, preserve_case=True)
+                # --- FIN CORRECTION ---
             except ValueError as e:
                 raise ValueError(f"Hill key error: {e}")
 
         elif algo == "playfair":
-            # MODIFIED PLAYFAIR ENCRYPTION LOGIC
             key = key_params.get('key', 'MONARCHY') if key_params else 'MONARCHY'
             try:
                 cipher = Playfair()
                 cipher.setPassword(key)
-                # Use encryptWithCase to preserve spaces and punctuation
                 return cipher.encryptWithCase(message)
             except PlayfairError as e:
                 raise ValueError(f"Playfair key/encryption error: {e}")
@@ -55,13 +59,6 @@ class CryptoService:
 
         else:
             raise ValueError(f"Unknown algorithm: {algorithm}")
-
-
-
-
-
-
-
 
     @staticmethod
     def decrypt_message(encrypted_message, algorithm, key_params=None):
@@ -75,30 +72,35 @@ class CryptoService:
             key = key_params.get('key', 'FRID') if key_params else 'FRID'
             key_len = len(key)
 
-            # ... (key length checks as above) ...
+            # --- CORRIGÉ ---
+            if key_len == 0:
+                raise ValueError("Hill key cannot be empty")
+            
+            n = int(math.sqrt(key_len))
+            if n * n != key_len:
+                raise ValueError(f"Hill key length must be a perfect square (4, 9, 16...). Got length {key_len}")
+            # --- FIN CORRECTION ---
 
             try:
-                # --- NEW LOGIC TO CREATE KEY MATRIX ---
-                key_bytes = key.encode('utf-8')
-                key_matrix = np.array([list(key_bytes[i*n:(i+1)*n]) for i in range(n)], dtype=int)
+                # --- CORRIGÉ ---
+                # Générer la matrice de la même manière
+                key_matrix = generate_key_matrix(key, n)
 
-                # Use the existing function name. The result is bytes.
-                decrypted_bytes = hill_decrypt_bytes(encrypted_message, key_matrix)
+                # Appeler la fonction de déchiffrement correcte
+                decrypted_text = hill_decrypt(encrypted_message, key_matrix, n)
 
-                # The original logic for restore_spaces is now irrelevant.
-                # You must decode the result to a string.
-                return decrypted_bytes.decode('utf-8')
+                # Utiliser votre fonction pour nettoyer la sortie
+                return restore_spaces(decrypted_text)
+                # --- FIN CORRECTION ---
 
             except ValueError as e:
                 raise ValueError(f"Hill key/decryption error: {e}")
 
         elif algo == "playfair":
-            # MODIFIED PLAYFAIR DECRYPTION LOGIC
             key = key_params.get('key', 'MONARCHY') if key_params else 'MONARCHY'
             try:
                 cipher = Playfair()
                 cipher.setPassword(key)
-                # Use decryptWithCase to correctly handle spaces and punctuation
                 return cipher.decryptWithCase(encrypted_message)
             except PlayfairError as e:
                 raise ValueError(f"Playfair key/decryption error: {e}")

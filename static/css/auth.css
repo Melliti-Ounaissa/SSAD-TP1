@@ -289,3 +289,35 @@ input:focus {
     font-size: 2rem;
   }
 }
+/* Add to auth.css */
+.attack-section {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  margin: 25px 0;
+}
+
+.btn-attack {
+  background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+  color: white;
+  box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+  width: 100%;
+  padding: 15px 0;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.btn-attack:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 25px rgba(255, 107, 107, 0.8);
+}

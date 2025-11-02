@@ -356,12 +356,100 @@ def run_crypto_attack():
 
 
 
+# KEEP ONLY ONE VERSION OF THE /attack ROUTE - CHOOSE ONE:
 
+# OPTION 1: If you want the original attack page that requires login:
 @app.route('/attack')
 def attack_page():
-       if 'user' not in session:
-           return redirect(url_for('auth'))  # Changed from 'login' to 'auth'
-       return render_template('attack.html', user=session['user'])
+    if 'user' not in session:
+        return redirect(url_for('auth'))
+    return render_template('attack.html', user=session['user'])
+
+# OR
+
+# OPTION 2: If you want the attack page to be accessible without login (clear session):
+# @app.route('/attack')
+# def attack_page():
+#     session.clear()  # Clear session for attack mode
+#     return render_template('attack.html')
+
+# BUT DON'T KEEP BOTH! I recommend keeping OPTION 1 if you want it to be a protected page.
+
+# Add the new attack_auth routes (these are different from /attack)
+
+@app.route('/attack_auth')
+def attack_auth_page():
+    # Clear session for attack mode - don't require login
+    session.clear()
+    return render_template('attack_auth.html')
+
+@app.route('/api/attack_auth/check-user', methods=['POST'])
+def check_user_exists_auth():
+    """Check if a username exists in the database"""
+    data = request.json
+    username = data.get('username')
+    
+    if not username:
+        return jsonify({"success": False, "message": "Username required"}), 400
+    
+    try:
+        # Check if user exists
+        result = auth_service.supabase.table('users').select('id, username').eq('username', username).execute()
+        
+        exists = len(result.data) > 0 if result.data else False
+        
+        return jsonify({
+            "success": True, 
+            "exists": exists,
+            "user": result.data[0] if exists else None
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+@app.route('/api/attack_auth/start', methods=['POST'])
+def start_attack_auth():
+    """Start a password attack on a user account"""
+    data = request.json
+    username = data.get('username')
+    method = data.get('method')  # 'dictionary' or 'bruteforce'
+    
+    if not username or not method:
+        return jsonify({"success": False, "message": "Username and method required"}), 400
+    
+    try:
+        # Get user's password hash for verification
+        result = auth_service.supabase.table('users').select('*').eq('username', username).execute()
+        
+        if not result.data:
+            return jsonify({"success": False, "message": "User not found"}), 404
+        
+        user = result.data[0]
+        stored_hash = user['password_hash']
+        salt = user['password_salt']
+        
+        # Initialize attack service
+        from backend.password_attack_service import PasswordAttackService
+        attack_service = PasswordAttackService()
+        
+        # Start attack based on method
+        if method == 'dictionary':
+            attack_result = attack_service.dictionary_attack(stored_hash, salt)
+        elif method == 'bruteforce':
+            attack_result = attack_service.brute_force_attack(stored_hash, salt)
+        else:
+            return jsonify({"success": False, "message": "Invalid attack method"}), 400
+        
+        return jsonify({
+            "success": True,
+            "message": f"Attack completed with {method} method",
+            "found": attack_result["success"],
+            "password": attack_result.get("password"),
+            "attempts": attack_result["attempts"]
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 if __name__ == '__main__':
     print("=" * 60)

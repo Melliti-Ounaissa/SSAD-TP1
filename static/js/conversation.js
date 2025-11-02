@@ -3,11 +3,16 @@ const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
 const algorithmSelect = document.getElementById('algorithm-select');
 const keyInputsDiv = document.getElementById('key-inputs');
+const refreshBtn = document.getElementById('refresh-btn'); // Add this button to your HTML
 
 let otherUsername = '';
+let autoRefreshInterval = null;
 
 // Store timers for auto-hide functionality
 const decryptTimers = {};
+
+// Track which messages are currently decrypted
+const decryptedMessages = new Set();
 
 function updateKeyInputs() {
     const algorithm = algorithmSelect.value;
@@ -20,14 +25,6 @@ function updateKeyInputs() {
                 <input type="number" id="caesar-shift" value="3" min="1" max="25">
             `;
             break;
-        case 'affine':
-            html = `
-                <label>a:</label>
-                <input type="number" id="affine-a" value="5" min="1">
-                <label>b:</label>
-                <input type="number" id="affine-b" value="8" min="0">
-            `;
-            break;
         case 'playfair':
             html = `
                 <label>Key:</label>
@@ -35,7 +32,10 @@ function updateKeyInputs() {
             `;
             break;
         case 'hill':
-            html = `<p style="color: #666; font-size: 0.85rem;">Hill uses default 3x3 matrix</p>`;
+            html = `
+                <label>Key:</label>
+                <input type="text" id="hill-key" value="FRID" placeholder="Length must be 4, 9, 16...">
+            `;
             break;
     }
 
@@ -58,9 +58,13 @@ async function loadConversation() {
                 otherUsername = other.username;
                 document.getElementById('conversation-title').textContent = `Conversation avec ${otherUsername}`;
             }
+        } else {
+            console.error('Failed to load conversation:', data.message);
+            messagesArea.innerHTML = '<p class="no-messages">Erreur de chargement des messages</p>';
         }
     } catch (error) {
         console.error('Error loading conversation:', error);
+        messagesArea.innerHTML = '<p class="no-messages">Erreur de connexion</p>';
     }
 }
 
@@ -70,13 +74,19 @@ function displayMessages(messages) {
         return;
     }
 
+    // Store scroll position
+    const isScrolledToBottom = messagesArea.scrollHeight - messagesArea.clientHeight <= messagesArea.scrollTop + 1;
+
     messagesArea.innerHTML = '';
     messages.forEach(message => {
         const messageEl = createMessageElement(message);
         messagesArea.appendChild(messageEl);
     });
 
-    messagesArea.scrollTop = messagesArea.scrollHeight;
+    // Scroll to bottom if user was already at bottom
+    if (isScrolledToBottom) {
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
 }
 
 function createMessageElement(message) {
@@ -85,17 +95,41 @@ function createMessageElement(message) {
     div.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
     div.dataset.messageId = message.id;
 
-    const sender = isSent ? 'You' : message.sender.username;
+    const sender = isSent ? 'Vous' : message.sender.username;
     const date = new Date(message.date_created).toLocaleString('fr-FR');
+
+    // Check if this message is currently decrypted
+    const isDecrypted = decryptedMessages.has(message.id);
+    const messageText = isDecrypted ? getDecryptedText(message) : escapeHtml(message.encrypted);
+    const messageClass = isDecrypted ? '' : 'encrypted';
 
     div.innerHTML = `
         <div class="message-info">${sender} • ${date}</div>
-        <div class="message-text encrypted" data-encrypted="${message.encrypted}" data-algo="${message.algo_name}" data-key='${message.algorithm_key || '{}'}'>${message.encrypted}</div>
-        <div class="message-meta">Algorithm: ${capitalizeFirst(message.algo_name)}</div>
-        ${!isSent ? '<button class="decrypt-btn" onclick="decryptMessage(this)">Decrypt</button>' : ''}
+        <div class="message-text ${messageClass}" 
+             data-encrypted="${escapeHtml(message.encrypted)}" 
+             data-algo="${message.algo_name}" 
+             data-key='${escapeHtml(message.algorithm_key || '{}')}'>
+            ${messageText}
+        </div>
+        <div class="message-meta">Algorithme: ${capitalizeFirst(message.algo_name)}</div>
+        ${!isSent ? createDecryptButton(message.id, isDecrypted) : ''}
     `;
 
     return div;
+}
+
+function getDecryptedText(message) {
+    // In a real implementation, you might want to store the decrypted text
+    // For now, we'll just show a placeholder or you can implement proper storage
+    return "🔓 Message déchiffré (recharger pour voir le texte chiffré)";
+}
+
+function createDecryptButton(messageId, isDecrypted) {
+    if (isDecrypted) {
+        return '<button class="decrypt-btn decrypted" disabled>✅ Déchiffré</button>';
+    } else {
+        return '<button class="decrypt-btn" onclick="decryptMessage(this)">🔓 Déchiffrer</button>';
+    }
 }
 
 async function decryptMessage(button) {
@@ -111,6 +145,10 @@ async function decryptMessage(button) {
         clearTimeout(decryptTimers[messageId]);
     }
 
+    // Disable button during decryption
+    button.disabled = true;
+    button.textContent = '⏳ Déchiffrement...';
+
     try {
         const response = await fetch('/api/crypto/decrypt', {
             method: 'POST',
@@ -125,24 +163,42 @@ async function decryptMessage(button) {
         const data = await response.json();
 
         if (data.success) {
-            const originalEncrypted = messageText.textContent;
+            // Store that this message is decrypted
+            decryptedMessages.add(messageId);
+            
+            // Update the message text
             messageText.textContent = data.decrypted;
             messageText.classList.remove('encrypted');
-            button.style.display = 'none';
+            
+            // Update the button
+            button.textContent = '✅ Déchiffré';
+            button.disabled = true;
+            button.classList.add('decrypted');
 
-            // Set timer to hide decrypted message after 1 minute (60 seconds)
+            // Optional: Set timer to auto-hide after longer period (5 minutes) or remove auto-hide completely
             decryptTimers[messageId] = setTimeout(() => {
-                messageText.textContent = originalEncrypted;
-                messageText.classList.add('encrypted');
-                button.style.display = 'inline-block';
-                delete decryptTimers[messageId];
-            }, 60000); // 60000ms = 60 seconds = 1 minute
+                // Only re-encrypt if user hasn't manually refreshed
+                if (decryptedMessages.has(messageId)) {
+                    messageText.textContent = encrypted;
+                    messageText.classList.add('encrypted');
+                    button.textContent = '🔓 Déchiffrer';
+                    button.disabled = false;
+                    button.classList.remove('decrypted');
+                    decryptedMessages.delete(messageId);
+                    delete decryptTimers[messageId];
+                }
+            }, 300000); // 300000ms = 5 minutes
+
         } else {
-            alert('Decryption error: ' + data.message);
+            alert('Erreur de déchiffrement: ' + data.message);
+            button.disabled = false;
+            button.textContent = '🔓 Déchiffrer';
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Failed to decrypt message');
+        alert('Échec du déchiffrement');
+        button.disabled = false;
+        button.textContent = '🔓 Déchiffrer';
     }
 }
 
@@ -151,11 +207,15 @@ async function sendMessage() {
     const algorithm = algorithmSelect.value;
 
     if (!message) {
-        alert('Please enter a message');
+        alert('Veuillez entrer un message');
         return;
     }
 
     const keyParams = getKeyParams(algorithm);
+
+    // Disable send button
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Envoi...';
 
     try {
         const response = await fetch('/api/messages/send', {
@@ -173,13 +233,17 @@ async function sendMessage() {
 
         if (data.success) {
             messageInput.value = '';
-            loadConversation();
+            // Reload conversation immediately after sending to show the new message
+            await loadConversation();
         } else {
-            alert('Error: ' + data.message);
+            alert('Erreur: ' + data.message);
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Failed to send message');
+        alert('Échec de l\'envoi du message');
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Envoyer';
     }
 }
 
@@ -188,14 +252,16 @@ function getKeyParams(algorithm) {
 
     switch(algorithm) {
         case 'ceasar':
-            params.shift = document.getElementById('caesar-shift')?.value || 3;
-            break;
-        case 'affine':
-            params.a = document.getElementById('affine-a')?.value || 5;
-            params.b = document.getElementById('affine-b')?.value || 8;
+            const shiftEl = document.getElementById('caesar-shift');
+            params.shift = shiftEl ? parseInt(shiftEl.value) : 3;
             break;
         case 'playfair':
-            params.key = document.getElementById('playfair-key')?.value || 'MONARCHY';
+            const keyEl = document.getElementById('playfair-key');
+            params.key = keyEl ? keyEl.value : 'MONARCHY';
+            break;
+        case 'hill':
+            const hillKeyEl = document.getElementById('hill-key');
+            params.key = hillKeyEl ? hillKeyEl.value.trim() : 'FRID';
             break;
     }
 
@@ -206,6 +272,30 @@ function capitalizeFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Manual refresh function
+async function manualRefresh() {
+    await loadConversation();
+}
+
+// Add refresh button to your HTML and use this function
+// <button id="refresh-btn" onclick="manualRefresh()">🔄 Actualiser</button>
+
+// Stop any auto refresh when leaving page
+window.addEventListener('beforeunload', () => {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+    // Clear all decrypt timers
+    Object.values(decryptTimers).forEach(timer => clearTimeout(timer));
+});
+
+// Event listeners
 sendBtn.addEventListener('click', sendMessage);
 messageInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -214,4 +304,6 @@ messageInput.addEventListener('keypress', (e) => {
     }
 });
 
+// Initialize - load conversation once on page load
+updateKeyInputs();
 loadConversation();

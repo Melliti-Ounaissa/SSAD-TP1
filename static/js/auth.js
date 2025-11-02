@@ -3,6 +3,7 @@ const passwordInput = document.getElementById("password")
 const signupBtn = document.getElementById("signup-btn")
 const signinBtn = document.getElementById("signin-btn")
 const errorMessage = document.getElementById("error-message")
+const attackBtn = document.getElementById("attack-btn")
 
 const togglePasswordBtn = document.getElementById("toggle-password-btn")
 const eyeIconOpen = document.querySelector(".eye-icon-open")
@@ -110,7 +111,13 @@ async function handleSignin() {
   }
 }
 
+function handleAttack() {
+    window.location.href = "/attack_auth"
+}
+
 togglePasswordBtn.addEventListener("click", togglePasswordVisibility)
+
+attackBtn.addEventListener("click", handleAttack)
 
 signupBtn.addEventListener("click", handleSignup)
 signinBtn.addEventListener("click", handleSignin)
