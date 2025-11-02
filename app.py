@@ -359,10 +359,9 @@ def run_crypto_attack():
 
 @app.route('/attack')
 def attack_page():
-    # You may want to require authentication here
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    return render_template('attack.html', user=session['user'])
+       if 'user' not in session:
+           return redirect(url_for('auth'))  # Changed from 'login' to 'auth'
+       return render_template('attack.html', user=session['user'])
 
 if __name__ == '__main__':
     print("=" * 60)

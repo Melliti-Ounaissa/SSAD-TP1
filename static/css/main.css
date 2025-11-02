@@ -1174,3 +1174,34 @@ body {
     padding: 35px;
   }
 }
+
+/* ====================================
+   ✨ Algorithms Grid & Card Enhancements
+   ==================================== */
+
+.algorithms-grid {
+  display: grid;
+  /* One single column */
+  grid-template-columns: 1fr;
+  gap: 30px;
+  /* Slightly reduced gap */
+  max-width: 550px;
+  /* Narrower width for focus */
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+.algorithm-card {
+  /* No special child targeting needed */
+  font-size: 1.5rem;
+  padding: 40px;
+}
+
+
+/* 3. Page Title Styling (for better centering) */
+.main-content .page-title {
+  text-align: center;
+  color: #0d214f;
+  /* Assuming this is your main accent color */
+  margin-top: 40px;
+}
