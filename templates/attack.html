@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cipher Attacks</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        /* Add some specific styles for the attack page */
+        .attack-section { max-width: 800px; margin: 30px auto; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .attack-section h2 { text-align: center; color: #0d214f; margin-bottom: 20px; }
+        .results-list { max-height: 500px; overflow-y: auto; margin-top: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .result-item { padding: 10px; border-bottom: 1px dotted #eee; }
+        .result-item.likely { background-color: #e6ffe6; border-left: 5px solid #28a745; font-weight: bold; }
+        .result-item span { font-family: monospace; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="/">Home</a>
+            <a href="/steganography">Steganography</a>
+            <a href="/attack">Cipher Attacks</a>
+            </nav>
+    </header>
+    <main class="attack-section">
+        <h2>🔓 Classical Cipher Attack Simulator</h2>
+
+        <div class="input-group">
+            <label for="cipher-type">Select Attack:</label>
+            <select id="cipher-type" class="recipient-dropdown">
+                <option value="caesar">Caesar (Brute-Force All 25)</option>
+                <option value="playfair_dict">Playfair (Dictionary Attack)</option>
+                <option value="hill_dict">Hill 2x2 (Dictionary Attack)</option>
+            </select>
+        </div>
+
+        <textarea id="ciphertext-input" class="message-input-stego" placeholder="Enter Ciphertext here..."></textarea>
+        
+        <button class="btn-send" onclick="runAttack()">Run Attack</button>
+        <div class="error-message" id="attack-error-message"></div>
+        
+        <div id="results-container">
+            <h3>Attack Results</h3>
+            <div class="results-list" id="results-list">
+                <p>Results will appear here...</p>
+            </div>
+        </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/attack.js') }}"></script>
+</body>
+</html>

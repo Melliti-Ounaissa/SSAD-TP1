@@ -4,6 +4,7 @@ from backend.auth_service import AuthService
 from backend.message_service import MessageService
 from backend.crypto_service import CryptoService
 from backend.stego_service import StegoService
+from backend.crypto_attack_service import CryptoAttackService
 import os
 import json
 from dotenv import load_dotenv
@@ -28,6 +29,7 @@ auth_service = AuthService()
 crypto_service = CryptoService()
 message_service = MessageService(crypto_service=crypto_service)
 stego_service = StegoService()
+crypto_attack_service = CryptoAttackService(keys_file='keys.txt', keys2_file='keys2.txt')
 
 
 def allowed_file(filename):
@@ -334,6 +336,33 @@ def serve_audio(filename):
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
+
+
+@app.route('/api/crypto/attack', methods=['POST'])
+def run_crypto_attack():
+    """
+    Endpoint to run dictionary or brute-force attacks on classical ciphers.
+    Input: { "cipher_type": "caesar" or "playfair_dict" or "hill_dict", "ciphertext": "..." }
+    """
+    data = request.get_json()
+    cipher_type = data.get('cipher_type')
+    ciphertext = data.get('ciphertext')
+    
+    if not cipher_type or not ciphertext:
+        return jsonify({"success": False, "message": "Missing cipher_type or ciphertext"}), 400
+        
+    result = crypto_attack_service.attack_cipher(cipher_type, ciphertext)
+    return jsonify(result), 200
+
+
+
+
+@app.route('/attack')
+def attack_page():
+    # You may want to require authentication here
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    return render_template('attack.html', user=session['user'])
 
 if __name__ == '__main__':
     print("=" * 60)
