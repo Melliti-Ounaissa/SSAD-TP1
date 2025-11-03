@@ -37,6 +37,13 @@ function createKeyInputs() {
                     <label>Shift (clé):</label>
                     <input type="number" id="caesar-shift" value="3" min="1" max="25">
                 </div>
+                <div class="key-input-group">
+                    <label>Direction:</label>
+                    <select id="caesar-direction">
+                        <option value="droite">Droite →</option>
+                        <option value="gauche">Gauche ←</option>
+                    </select>
+                </div>
             `;
             break;
         case 'affine':
@@ -60,7 +67,6 @@ function createKeyInputs() {
             `;
             break;
         case 'hill':
-            // MODIFIED HILL INPUT
             html = `
                 <div class="key-input-group">
                     <label>Key (longueur 4, 9, 16...):</label>
@@ -75,6 +81,14 @@ function createKeyInputs() {
     
     if (keyInputsDiv) {
         keyInputsDiv.innerHTML = html;
+        
+        // Add event listeners for real-time encryption
+        if (algorithm === 'ceasar') {
+            const shiftInput = document.getElementById('caesar-shift');
+            const directionSelect = document.getElementById('caesar-direction');
+            if (shiftInput) shiftInput.addEventListener('input', encryptMessage);
+            if (directionSelect) directionSelect.addEventListener('change', encryptMessage);
+        }
     }
 }
 
@@ -85,7 +99,9 @@ function getKeyParams() {
     switch(algorithm) {
         case 'ceasar':
             const shiftInput = document.getElementById('caesar-shift');
+            const directionSelect = document.getElementById('caesar-direction');
             params.shift = shiftInput ? parseInt(shiftInput.value) : 3;
+            params.direction = directionSelect ? directionSelect.value : 'droite';
             break;
         case 'affine':
             const aInput = document.getElementById('affine-a');
@@ -98,7 +114,6 @@ function getKeyParams() {
             params.key = playfairKeyInput ? playfairKeyInput.value : 'MONARCHY';
             break;
         case 'hill':
-            // MODIFIED HILL KEY PARAM
             const keyInput = document.getElementById('hill-key');
             params.key = keyInput ? keyInput.value.trim() : 'FRID';
             break;

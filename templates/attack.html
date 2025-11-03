@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cryptography Toolkit - Attacks</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/attack.css') }}">
 </head>
 <body>
     <div class="app-container">
@@ -25,10 +24,6 @@
                     <span class="nav-icon">🎵</span>
                     <span class="nav-text">Stéganographie</span>
                 </a>
-                <a href="{{ url_for('attack_page') }}" class="nav-item active">
-                     <span class="nav-icon">⚔️</span>
-                     <span class="nav-text">Attaques</span>
-                 </a>
             </nav>
 
             <div class="sidebar-footer">
@@ -38,134 +33,13 @@
 
         <main class="main-content">
             <div class="page-header">
-                <h1 class="page-title">⚔️ Cryptanalysis Attacks</h1>
-                <p class="page-subtitle">Test the security of encrypted messages using brute force and dictionary attacks</p>
-            </div>
-
-            <div class="attack-container">
-                <!-- Attack Type Tabs -->
-                <div class="attack-tabs">
-                    <button class="tab-button active" data-tab="brute-force">
-                        🔨 Brute Force
-                    </button>
-                    <button class="tab-button" data-tab="dictionary">
-                        📖 Dictionary Attack
-                    </button>
-                </div>
-
-                <!-- Brute Force Tab -->
-                <div class="tab-content active" id="brute-force">
-                    <div class="attack-info">
-                        <p><strong>💡 Brute Force Attack:</strong> Tests all possible key combinations to decrypt the message. Effective for algorithms with small key spaces (Caesar, simple substitution).</p>
-                    </div>
-
-                    <div class="input-section">
-                        <h3>🎯 Attack Configuration</h3>
-                        
-                        <div class="form-group">
-                            <label>Select Cipher Algorithm</label>
-                            <select id="bf-algorithm" class="input-select">
-                                <option value="caesar">Caesar Cipher</option>
-                                <option value="hill_brute">Hill Cipher (2x2) - Full Brute Force</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Encrypted Message</label>
-                            <textarea id="bf-ciphertext" class="input-textarea" placeholder="Enter the encrypted message to attack...">XJSIRSFQJSJD</textarea>
-                        </div>
-
-                        <button class="attack-button" id="start-brute-force">
-                            🚀 Start Brute Force Attack
-                        </button>
-                    </div>
-
-                    <div class="results-section" id="bf-results">
-                        <h3>📊 Attack Results</h3>
-                        
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="bf-progress">0%</div>
-                        </div>
-
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-value" id="bf-tested">0</div>
-                                <div class="stat-label">Keys Tested</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value" id="bf-found">0</div>
-                                <div class="stat-label">Candidates Found</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value" id="bf-time">0s</div>
-                                <div class="stat-label">Time Elapsed</div>
-                            </div>
-                        </div>
-
-                        <div class="results-list" id="bf-results-list">
-                            <!-- Results will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Dictionary Attack Tab -->
-                <div class="tab-content" id="dictionary">
-                    <div class="attack-info">
-                        <p><strong>💡 Dictionary Attack:</strong> Tests keys from a predefined wordlist. Very effective for Playfair and Hill ciphers that use keyword-based keys.</p>
-                    </div>
-
-                    <div class="input-section">
-                        <h3>🎯 Attack Configuration</h3>
-                        
-                        <div class="form-group">
-                            <label>Select Cipher Algorithm</label>
-                            <select id="dict-algorithm" class="input-select">
-                                <option value="playfair_dict">Playfair Cipher</option>
-                                <option value="hill_dict">Hill Cipher (2x2)</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Encrypted Message</label>
-                            <textarea id="dict-ciphertext" class="input-textarea" placeholder="Enter the encrypted message to attack...">LBMQUXKRNBKIMGLBNTMFQZTMXGZ</textarea>
-                        </div>
-
-                        <button class="attack-button" id="start-dictionary">
-                            🚀 Start Dictionary Attack
-                        </button>
-                    </div>
-
-                    <div class="results-section" id="dict-results">
-                        <h3>📊 Attack Results</h3>
-                        
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="dict-progress">0%</div>
-                        </div>
-
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-value" id="dict-tested">0</div>
-                                <div class="stat-label">Keys Tested</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value" id="dict-found">0</div>
-                                <div class="stat-label">Candidates Found</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value" id="dict-time">0s</div>
-                                <div class="stat-label">Time Elapsed</div>
-                            </div>
-                        </div>
-
-                        <div class="results-list" id="dict-results-list">
-                            <!-- Results will be populated here -->
-                        </div>
-                    </div>
-                </div>
+                <h1 class="page-title">⚔️ Attacks</h1>
+                <p class="page-subtitle" style="text-align: center; color: #666; margin-top: 20px;">
+                    Cette page est en cours de développement.<br>
+                    Utilisez <a href="/attack_auth" style="color: #667eea; text-decoration: underline;">l'attaque d'authentification</a> pour tester la sécurité des mots de passe.
+                </p>
             </div>
         </main>
     </div>
-
-    <script src="{{ url_for('static', filename='js/attack.js') }}"></script>
 </body>
 </html>

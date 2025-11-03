@@ -10,7 +10,7 @@
     <div class="container">
         <div class="left-section">
             <div class="form-container">
-                <h1>Attaquer un compte</h1>
+                <h1>⚔️ Attaquer un compte</h1>
 
                 <div class="input-group">
                     <input type="text" id="target-username" placeholder="Nom d'utilisateur cible" required>
@@ -18,20 +18,30 @@
 
                 <div class="attack-options">
                     <h3>Méthode d'attaque:</h3>
-                    <div class="attack-option" data-method="dictionary">
-                        <strong>📚 Attaque par dictionnaire</strong>
-                        <p>Teste les mots de passe depuis une liste prédéfinie</p>
+                    <div class="attack-option" data-method="dictionary3">
+                        <strong>📚 Attaque par Dictionnaire (3 char)</strong>
+                        <p>Teste les mots de passe de 3 caractères (ex: 234, 432)</p>
+                        <small style="opacity: 0.7;">⚡ Rapide - Utilise 'worldlist3.txt'</small>
                     </div>
+
+                    <div class="attack-option" data-method="dictionary5">
+                        <strong>📚 Attaque par Dictionnaire (5 char)</strong>
+                        <p>Teste les mots de passe de 5 caractères (ex: 12345, 98765)</p>
+                        <small style="opacity: 0.7;">⚡ Modéré - Utilise 'worldlist5.txt'</small>
+                    </div>
+
                     <div class="attack-option" data-method="bruteforce">
                         <strong>💥 Attaque par force brute</strong>
-                        <p>Teste toutes les combinaisons possibles</p>
+                        <p>Teste toutes les combinaisons de 6 caractères (a-z, A-Z, 0-9, +, *)</p>
+                        <small style="opacity: 0.7;">🐌 Lent</small>
                     </div>
-                </div>
+                    
+                    </div>
 
                 <div class="error-message" id="error-message"></div>
                 <div class="success-message" id="success-message"></div>
 
-                <button class="btn btn-attack" id="start-attack">Lancer l'attaque</button>
+                <button class="btn btn-attack" id="start-attack">🚀 Lancer l'attaque</button>
 
                 <div class="attack-progress" id="attack-progress">
                     <h4>Progression de l'attaque:</h4>
@@ -54,6 +64,10 @@
                 <div class="security-illustration">
                     <div class="lock-icon">⚔️</div>
                     <p>Mode Attaque</p>
+                    <small style="margin-top: 20px; opacity: 0.8;">
+                        Testez la sécurité des mots de passe<br>
+                        Éducatif uniquement
+                    </small>
                 </div>
             </div>
         </div>

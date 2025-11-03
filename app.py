@@ -4,7 +4,6 @@ from backend.auth_service import AuthService
 from backend.message_service import MessageService
 from backend.crypto_service import CryptoService
 from backend.stego_service import StegoService
-from backend.crypto_attack_service import CryptoAttackService
 from backend.password_attack_service import PasswordAttackService
 import os
 import json
@@ -31,7 +30,6 @@ auth_service = AuthService()
 crypto_service = CryptoService()
 message_service = MessageService(crypto_service=crypto_service)
 stego_service = StegoService()
-crypto_attack_service = CryptoAttackService(keys_file='keys.txt', keys2_file='keys2.txt')
 password_attack_service = PasswordAttackService(wordlist_path='wordlist.txt')
 
 
@@ -341,35 +339,6 @@ def serve_audio(filename):
 
 
 # ============================================================================
-# CRYPTOGRAPHIC ATTACK ROUTES
-# ============================================================================
-
-@app.route('/api/crypto/attack', methods=['POST'])
-def run_crypto_attack():
-    """
-    Endpoint to run dictionary or brute-force attacks on classical ciphers.
-    Input: { "cipher_type": "caesar" or "playfair_dict" or "hill_dict", "ciphertext": "..." }
-    """
-    data = request.get_json()
-    cipher_type = data.get('cipher_type')
-    ciphertext = data.get('ciphertext')
-    
-    if not cipher_type or not ciphertext:
-        return jsonify({"success": False, "message": "Missing cipher_type or ciphertext"}), 400
-        
-    result = crypto_attack_service.attack_cipher(cipher_type, ciphertext)
-    return jsonify(result), 200
-
-
-@app.route('/attack')
-def attack_page():
-    """Cryptographic attack page (requires login)"""
-    if 'user' not in session:
-        return redirect(url_for('auth'))
-    return render_template('attack.html', user=session['user'])
-
-
-# ============================================================================
 # PASSWORD ATTACK ROUTES (Authentication Attacks)
 # ============================================================================
 
@@ -410,7 +379,8 @@ def check_user_exists_auth():
 def start_attack_auth():
     """
     Start a password attack on a user account
-    Uses the imported attack modules from Attacks/brute.py and Attacks/dictionary_attack.py
+    - Dictionary attack: for 3 and 5 character passwords
+    - Brute force attack: for 6 character passwords
     """
     data = request.json
     username = data.get('username')
@@ -439,23 +409,32 @@ def start_attack_auth():
         print(f"Salt: {salt}")
         print(f"{'='*80}\n")
         
-        # Start attack based on method using the imported modules
-        if method == 'dictionary':
-            attack_result = password_attack_service.dictionary_attack(
-                stored_hash, 
-                salt, 
-                username
-            )
-        elif method == 'bruteforce':
-            attack_result = password_attack_service.brute_force_attack(
-                stored_hash, 
-                salt, 
-                username
-            )
-        else:
-            return jsonify({"success": False, "message": "Invalid attack method"}), 400
+        # Start attack based on method
+        # In app.py, inside the /api/attack_auth route handler
+
+# ... existing code to retrieve user data, stored_hash, salt, and username ...
+    
+        method = data.get('method')
+        attack_result = {}
         
-        # Prepare response
+        if method == 'dictionary3':
+            # New method for 3-character dictionary
+            attack_result = password_attack_service.dictionary3_attack(stored_hash, salt, username)
+        elif method == 'dictionary5':
+            # New method for 5-character dictionary
+            attack_result = password_attack_service.dictionary5_attack(stored_hash, salt, username)
+        elif method == 'bruteforce':
+            # Existing brute-force method
+            attack_result = password_attack_service.brute_force_6char_attack(stored_hash, salt, username)
+        # You might want to remove or update the old combined 'dictionary' case if it exists:
+        elif method == 'dictionary':
+            # This is the old, combined attack. Consider removing it or using dictionary3_attack/dictionary5_attack here if you need it as a fallback.
+            attack_result = password_attack_service.dictionary_attack(stored_hash, salt, username)
+        else:
+            # Handle unknown methods
+            return jsonify({"success": False, "message": "Unknown attack method specified."}), 400
+
+
         response_data = {
             "success": True,
             "message": f"Attack completed with {method} method",
@@ -500,9 +479,9 @@ if __name__ == '__main__':
     print("Server starting on http://localhost:5000")
     print("Open your browser and navigate to: http://localhost:5000")
     print("=" * 60)
-    print("\nAvailable Attack Endpoints:")
-    print("  - /attack         : Cryptographic attacks (requires login)")
-    print("  - /attack_auth    : Password attacks (no login required)")
+    print("\nAvailable Features:")
+    print("  - /auth         : User authentication")
+    print("  - /attack_auth  : Password attacks (educational)")
     print("=" * 60)
     print()
     app.run(debug=True, port=5000, host='0.0.0.0')

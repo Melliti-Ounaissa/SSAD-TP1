@@ -3,15 +3,11 @@ const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
 const algorithmSelect = document.getElementById('algorithm-select');
 const keyInputsDiv = document.getElementById('key-inputs');
-const refreshBtn = document.getElementById('refresh-btn'); // Add this button to your HTML
+const refreshBtn = document.getElementById('refresh-btn');
 
 let otherUsername = '';
 let autoRefreshInterval = null;
-
-// Store timers for auto-hide functionality
 const decryptTimers = {};
-
-// Track which messages are currently decrypted
 const decryptedMessages = new Set();
 
 function updateKeyInputs() {
@@ -23,6 +19,11 @@ function updateKeyInputs() {
             html = `
                 <label>Shift:</label>
                 <input type="number" id="caesar-shift" value="3" min="1" max="25">
+                <label>Direction:</label>
+                <select id="caesar-direction">
+                    <option value="droite">Droite →</option>
+                    <option value="gauche">Gauche ←</option>
+                </select>
             `;
             break;
         case 'playfair':
@@ -74,7 +75,6 @@ function displayMessages(messages) {
         return;
     }
 
-    // Store scroll position
     const isScrolledToBottom = messagesArea.scrollHeight - messagesArea.clientHeight <= messagesArea.scrollTop + 1;
 
     messagesArea.innerHTML = '';
@@ -83,7 +83,6 @@ function displayMessages(messages) {
         messagesArea.appendChild(messageEl);
     });
 
-    // Scroll to bottom if user was already at bottom
     if (isScrolledToBottom) {
         messagesArea.scrollTop = messagesArea.scrollHeight;
     }
@@ -98,7 +97,6 @@ function createMessageElement(message) {
     const sender = isSent ? 'Vous' : message.sender.username;
     const date = new Date(message.date_created).toLocaleString('fr-FR');
 
-    // Check if this message is currently decrypted
     const isDecrypted = decryptedMessages.has(message.id);
     const messageText = isDecrypted ? getDecryptedText(message) : escapeHtml(message.encrypted);
     const messageClass = isDecrypted ? '' : 'encrypted';
@@ -119,8 +117,6 @@ function createMessageElement(message) {
 }
 
 function getDecryptedText(message) {
-    // In a real implementation, you might want to store the decrypted text
-    // For now, we'll just show a placeholder or you can implement proper storage
     return "🔓 Message déchiffré (recharger pour voir le texte chiffré)";
 }
 
@@ -140,12 +136,10 @@ async function decryptMessage(button) {
     const messageBubble = button.closest('.message-bubble');
     const messageId = messageBubble.dataset.messageId;
 
-    // Clear any existing timer for this message
     if (decryptTimers[messageId]) {
         clearTimeout(decryptTimers[messageId]);
     }
 
-    // Disable button during decryption
     button.disabled = true;
     button.textContent = '⏳ Déchiffrement...';
 
@@ -163,21 +157,16 @@ async function decryptMessage(button) {
         const data = await response.json();
 
         if (data.success) {
-            // Store that this message is decrypted
             decryptedMessages.add(messageId);
             
-            // Update the message text
             messageText.textContent = data.decrypted;
             messageText.classList.remove('encrypted');
             
-            // Update the button
             button.textContent = '✅ Déchiffré';
             button.disabled = true;
             button.classList.add('decrypted');
 
-            // Optional: Set timer to auto-hide after longer period (5 minutes) or remove auto-hide completely
             decryptTimers[messageId] = setTimeout(() => {
-                // Only re-encrypt if user hasn't manually refreshed
                 if (decryptedMessages.has(messageId)) {
                     messageText.textContent = encrypted;
                     messageText.classList.add('encrypted');
@@ -187,7 +176,7 @@ async function decryptMessage(button) {
                     decryptedMessages.delete(messageId);
                     delete decryptTimers[messageId];
                 }
-            }, 300000); // 300000ms = 5 minutes
+            }, 300000);
 
         } else {
             alert('Erreur de déchiffrement: ' + data.message);
@@ -213,7 +202,6 @@ async function sendMessage() {
 
     const keyParams = getKeyParams(algorithm);
 
-    // Disable send button
     sendBtn.disabled = true;
     sendBtn.textContent = 'Envoi...';
 
@@ -233,7 +221,6 @@ async function sendMessage() {
 
         if (data.success) {
             messageInput.value = '';
-            // Reload conversation immediately after sending to show the new message
             await loadConversation();
         } else {
             alert('Erreur: ' + data.message);
@@ -253,7 +240,9 @@ function getKeyParams(algorithm) {
     switch(algorithm) {
         case 'ceasar':
             const shiftEl = document.getElementById('caesar-shift');
+            const directionEl = document.getElementById('caesar-direction');
             params.shift = shiftEl ? parseInt(shiftEl.value) : 3;
+            params.direction = directionEl ? directionEl.value : 'droite';
             break;
         case 'playfair':
             const keyEl = document.getElementById('playfair-key');
@@ -278,24 +267,17 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Manual refresh function
 async function manualRefresh() {
     await loadConversation();
 }
 
-// Add refresh button to your HTML and use this function
-// <button id="refresh-btn" onclick="manualRefresh()">🔄 Actualiser</button>
-
-// Stop any auto refresh when leaving page
 window.addEventListener('beforeunload', () => {
     if (autoRefreshInterval) {
         clearInterval(autoRefreshInterval);
     }
-    // Clear all decrypt timers
     Object.values(decryptTimers).forEach(timer => clearTimeout(timer));
 });
 
-// Event listeners
 sendBtn.addEventListener('click', sendMessage);
 messageInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -304,6 +286,5 @@ messageInput.addEventListener('keypress', (e) => {
     }
 });
 
-// Initialize - load conversation once on page load
 updateKeyInputs();
 loadConversation();

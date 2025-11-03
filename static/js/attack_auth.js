@@ -1,4 +1,4 @@
-// attack_auth.js - JavaScript for the attack authentication page
+// attack_auth.js - Corrected version (No fake simulation)
 
 const targetUsernameInput = document.getElementById("target-username")
 const attackOptions = document.querySelectorAll(".attack-option")
@@ -90,6 +90,15 @@ async function startAttack() {
         addLogEntry("✅ Utilisateur trouvé, lancement de l'attaque...", "success")
         updateProgress(10, "Préparation de l'attaque...")
         
+        // Add method-specific info
+        if (selectedMethod === 'dictionary3') {
+            addLogEntry("📚 Mode: Attaque par dictionnaire (3 caractères)", "trying");
+        } else if (selectedMethod === 'dictionary5') {
+            addLogEntry("📚 Mode: Attaque par dictionnaire (5 chiffres)", "trying");
+        } else if (selectedMethod === 'bruteforce') {
+            addLogEntry("💥 Mode: Force brute (6 caractères: a-z, A-Z, 0-9, +, *)", "trying");
+        }
+        
         // Start the actual attack
         const attackResponse = await fetch("/api/attack_auth/start", {
             method: "POST",
@@ -105,8 +114,9 @@ async function startAttack() {
         const attackData = await attackResponse.json()
         
         if (attackData.success) {
-            // Simulate attack progress with real algorithm simulation
-            simulateAttackProgress(username, selectedMethod, attackData)
+            // *** THIS IS THE FIX ***
+            // Instead of simulating, just show the real result immediately.
+            showAttackResult(username, attackData)
         } else {
             showError(attackData.message)
             isAttackRunning = false
@@ -121,92 +131,36 @@ async function startAttack() {
     }
 }
 
-// Simulate attack progress with realistic patterns
-function simulateAttackProgress(username, method, attackData) {
-    let progress = 10
-    const totalSteps = method === "dictionary" ? 150 : 300
-    let foundPassword = null
+// NEW FUNCTION: Displays the final result from the server
+function showAttackResult(username, attackData) {
+    let foundPassword = null;
+
+    if (attackData.found) {
+        foundPassword = attackData.password;
+        addLogEntry(`🎉 MOT DE PASSE TROUVÉ: ${foundPassword}`, "success");
+        addLogEntry(`📊 Tentatives: ${attackData.attempts.toLocaleString()}`, "success");
+        addLogEntry(`⏱️ Durée: ${attackData.duration.toFixed(2)}s`, "success");
+        updateProgress(100, "Attaque terminée avec succès!");
+        successMessage.textContent = `Mot de passe trouvé: ${foundPassword}`;
+        
+        // Auto-login after 3 seconds
+        setTimeout(() => {
+            attemptAutoLogin(username, foundPassword);
+        }, 3000);
+    } else {
+        addLogEntry("❌ Aucun mot de passe trouvé avec cette méthode", "error");
+        addLogEntry(`📊 Tentatives: ${attackData.attempts.toLocaleString()}`, "trying");
+        addLogEntry(`⏱️ Durée: ${attackData.duration.toFixed(2)}s`, "trying");
+        updateProgress(100, "Attaque terminée - Aucun résultat");
+        successMessage.textContent = "Aucun mot de passe trouvé. Essayez une autre méthode.";
+    }
     
-    const interval = setInterval(() => {
-        if (progress >= 100) {
-            clearInterval(interval)
-            if (!foundPassword) {
-                addLogEntry("❌ Aucun mot de passe trouvé avec cette méthode", "error")
-                updateProgress(100, "Attaque terminée - Aucun résultat")
-                successMessage.textContent = "Aucun mot de passe trouvé. Essayez une autre méthode."
-            }
-            isAttackRunning = false
-            startAttackBtn.disabled = false
-            return
-        }
-        
-        progress += Math.random() * 8
-        progress = Math.min(progress, 100)
-        
-        // Generate realistic password attempts based on method
-        const currentPassword = generateRealisticPassword(method, progress)
-        
-        addLogEntry(`🔑 Test du mot de passe: ${currentPassword}`, "trying")
-        
-        const phase = progress < 33 ? "Phase 1" : progress < 66 ? "Phase 2" : "Phase 3"
-        const testedPercentage = Math.round(progress/totalSteps*100)
-        updateProgress(progress, `${phase} - Testé ${testedPercentage}% des combinaisons`)
-        
-        // Simulate finding password (more likely in later stages)
-        if (progress >= 70 && Math.random() < 0.15) {
-            clearInterval(interval)
-            foundPassword = attackData.password || generateRealisticPassword(method, 100)
-            addLogEntry(`🎉 MOT DE PASSE TROUVÉ: ${foundPassword}`, "success")
-            updateProgress(100, "Attaque terminée avec succès!")
-            successMessage.textContent = `Mot de passe trouvé: ${foundPassword}`
-            
-            // Auto-login after 3 seconds
-            setTimeout(() => {
-                attemptAutoLogin(username, foundPassword)
-            }, 3000)
-            isAttackRunning = false
-            startAttackBtn.disabled = false
-        }
-    }, 300) // Update every 300ms for realistic feel
+    isAttackRunning = false;
+    startAttackBtn.disabled = false;
 }
 
-function generateRealisticPassword(method, progress) {
-    if (method === "dictionary") {
-        const dictionary = [
-            "234", "432", "12345", "54321", "11111", "123456", 
-            "password", "qwerty", "admin", "secret", "test", 
-            "123", "321", "00000", "q7*88+", "hello", "welcome"
-        ]
-        const index = Math.floor((progress / 100) * dictionary.length)
-        return dictionary[Math.min(index, dictionary.length - 1)]
-    } else {
-        // Brute force - generate based on progress and realistic patterns
-        if (progress < 33) {
-            // Phase 1: 3-character passwords
-            const chars = "234"
-            let password = ""
-            for (let i = 0; i < 3; i++) {
-                password += chars[Math.floor(Math.random() * chars.length)]
-            }
-            return password
-        } else if (progress < 66) {
-            // Phase 2: 5-digit passwords
-            let password = ""
-            for (let i = 0; i < 5; i++) {
-                password += Math.floor(Math.random() * 10)
-            }
-            return password
-        } else {
-            // Phase 3: 6-character passwords
-            const chars = "abcdefghijklmnopqrstuvwxyz0123456789+*"
-            let password = ""
-            for (let i = 0; i < 6; i++) {
-                password += chars[Math.floor(Math.random() * chars.length)]
-            }
-            return password
-        }
-    }
-}
+// DELETED: simulateAttackProgress() (No longer needed)
+// DELETED: generateRealisticPassword() (No longer needed)
 
 async function attemptAutoLogin(username, password) {
     addLogEntry("🔐 Tentative de connexion automatique...", "success")
@@ -250,7 +204,6 @@ function goBack() {
 startAttackBtn.addEventListener("click", startAttack)
 backBtn.addEventListener("click", goBack)
 
-// Enter key support
 targetUsernameInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
         startAttack()
