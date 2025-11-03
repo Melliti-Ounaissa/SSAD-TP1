@@ -5,6 +5,7 @@ from backend.message_service import MessageService
 from backend.crypto_service import CryptoService
 from backend.stego_service import StegoService
 from backend.crypto_attack_service import CryptoAttackService
+from backend.password_attack_service import PasswordAttackService
 import os
 import json
 from dotenv import load_dotenv
@@ -25,11 +26,13 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Initialize services
 auth_service = AuthService()
 crypto_service = CryptoService()
 message_service = MessageService(crypto_service=crypto_service)
 stego_service = StegoService()
 crypto_attack_service = CryptoAttackService(keys_file='keys.txt', keys2_file='keys2.txt')
+password_attack_service = PasswordAttackService(wordlist_path='wordlist.txt')
 
 
 def allowed_file(filename):
@@ -337,6 +340,9 @@ def serve_audio(filename):
         return jsonify({"success": False, "message": str(e)}), 500
 
 
+# ============================================================================
+# CRYPTOGRAPHIC ATTACK ROUTES
+# ============================================================================
 
 @app.route('/api/crypto/attack', methods=['POST'])
 def run_crypto_attack():
@@ -355,33 +361,25 @@ def run_crypto_attack():
     return jsonify(result), 200
 
 
-
-# KEEP ONLY ONE VERSION OF THE /attack ROUTE - CHOOSE ONE:
-
-# OPTION 1: If you want the original attack page that requires login:
 @app.route('/attack')
 def attack_page():
+    """Cryptographic attack page (requires login)"""
     if 'user' not in session:
         return redirect(url_for('auth'))
     return render_template('attack.html', user=session['user'])
 
-# OR
 
-# OPTION 2: If you want the attack page to be accessible without login (clear session):
-# @app.route('/attack')
-# def attack_page():
-#     session.clear()  # Clear session for attack mode
-#     return render_template('attack.html')
-
-# BUT DON'T KEEP BOTH! I recommend keeping OPTION 1 if you want it to be a protected page.
-
-# Add the new attack_auth routes (these are different from /attack)
+# ============================================================================
+# PASSWORD ATTACK ROUTES (Authentication Attacks)
+# ============================================================================
 
 @app.route('/attack_auth')
 def attack_auth_page():
+    """Password attack page (no login required for educational/testing purposes)"""
     # Clear session for attack mode - don't require login
     session.clear()
     return render_template('attack_auth.html')
+
 
 @app.route('/api/attack_auth/check-user', methods=['POST'])
 def check_user_exists_auth():
@@ -407,9 +405,13 @@ def check_user_exists_auth():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
+
 @app.route('/api/attack_auth/start', methods=['POST'])
 def start_attack_auth():
-    """Start a password attack on a user account"""
+    """
+    Start a password attack on a user account
+    Uses the imported attack modules from Attacks/brute.py and Attacks/dictionary_attack.py
+    """
     data = request.json
     username = data.get('username')
     method = data.get('method')  # 'dictionary' or 'bruteforce'
@@ -428,28 +430,68 @@ def start_attack_auth():
         stored_hash = user['password_hash']
         salt = user['password_salt']
         
-        # Initialize attack service
-        from backend.password_attack_service import PasswordAttackService
-        attack_service = PasswordAttackService()
+        print(f"\n{'='*80}")
+        print(f"PASSWORD ATTACK REQUEST")
+        print(f"{'='*80}")
+        print(f"Username: {username}")
+        print(f"Method: {method}")
+        print(f"Hash: {stored_hash[:40]}...")
+        print(f"Salt: {salt}")
+        print(f"{'='*80}\n")
         
-        # Start attack based on method
+        # Start attack based on method using the imported modules
         if method == 'dictionary':
-            attack_result = attack_service.dictionary_attack(stored_hash, salt)
+            attack_result = password_attack_service.dictionary_attack(
+                stored_hash, 
+                salt, 
+                username
+            )
         elif method == 'bruteforce':
-            attack_result = attack_service.brute_force_attack(stored_hash, salt)
+            attack_result = password_attack_service.brute_force_attack(
+                stored_hash, 
+                salt, 
+                username
+            )
         else:
             return jsonify({"success": False, "message": "Invalid attack method"}), 400
         
-        return jsonify({
+        # Prepare response
+        response_data = {
             "success": True,
             "message": f"Attack completed with {method} method",
             "found": attack_result["success"],
             "password": attack_result.get("password"),
-            "attempts": attack_result["attempts"]
-        }), 200
+            "attempts": attack_result["attempts"],
+            "duration": attack_result.get("duration", 0),
+            "method": attack_result["method"]
+        }
+        
+        print(f"\n{'='*80}")
+        print(f"PASSWORD ATTACK RESULT")
+        print(f"{'='*80}")
+        print(f"Found: {response_data['found']}")
+        if response_data['found']:
+            print(f"Password: {response_data['password']}")
+        print(f"Attempts: {response_data['attempts']}")
+        print(f"Duration: {response_data['duration']:.3f}s")
+        print(f"{'='*80}\n")
+        
+        return jsonify(response_data), 200
         
     except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"\n{'='*80}")
+        print(f"ERROR IN PASSWORD ATTACK")
+        print(f"{'='*80}")
+        print(error_trace)
+        print(f"{'='*80}\n")
+        
+        return jsonify({
+            "success": False, 
+            "message": f"Attack failed: {str(e)}"
+        }), 500
+
 
 if __name__ == '__main__':
     print("=" * 60)
@@ -457,6 +499,10 @@ if __name__ == '__main__':
     print("=" * 60)
     print("Server starting on http://localhost:5000")
     print("Open your browser and navigate to: http://localhost:5000")
+    print("=" * 60)
+    print("\nAvailable Attack Endpoints:")
+    print("  - /attack         : Cryptographic attacks (requires login)")
+    print("  - /attack_auth    : Password attacks (no login required)")
     print("=" * 60)
     print()
     app.run(debug=True, port=5000, host='0.0.0.0')
