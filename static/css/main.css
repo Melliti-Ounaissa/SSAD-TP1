@@ -1205,3 +1205,419 @@ body {
   /* Assuming this is your main accent color */
   margin-top: 40px;
 }
+
+
+/* ====================================
+   🎵 STEGANOGRAPHY PAGE STYLING
+   ==================================== */
+
+/* Section containers */
+.stego-section {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+}
+
+.stego-section:hover {
+  box-shadow: 0 0 30px rgba(72, 191, 227, 0.4);
+}
+
+.stego-section h2 {
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 3px solid rgba(76, 201, 240, 0.5);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Upload area styling */
+.upload-area {
+  background: rgba(255, 255, 255, 0.1);
+  border: 3px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 50px 30px;
+  text-align: center;
+  margin-bottom: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #4cc9f0;
+  box-shadow: 0 0 20px rgba(76, 201, 240, 0.3);
+}
+
+.upload-label {
+  cursor: pointer;
+  display: block;
+}
+
+.upload-icon {
+  font-size: 4rem;
+  margin-bottom: 15px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.upload-label p {
+  color: #ffffff;
+  font-size: 1.1rem;
+  margin: 10px 0;
+}
+
+.upload-label strong {
+  color: #4cc9f0;
+  text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+}
+
+#audio-file {
+  display: none;
+}
+
+.file-info {
+  margin-top: 15px;
+  padding: 15px;
+  background: rgba(76, 201, 240, 0.2);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.file-info strong {
+  color: #4cc9f0;
+}
+
+/* Message input area */
+.message-input-stego {
+  width: 100%;
+  min-height: 120px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-family: Arial, sans-serif;
+  resize: vertical;
+  margin-bottom: 25px;
+  transition: all 0.3s ease;
+}
+
+.message-input-stego:focus {
+  outline: none;
+  border-color: #4cc9f0;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 15px rgba(76, 201, 240, 0.4);
+}
+
+.message-input-stego::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Send section styling */
+.send-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  margin-top: 25px;
+}
+
+.recipient-select {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.recipient-select label {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.recipient-dropdown {
+  flex: 1;
+  max-width: 300px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(76, 201, 240, 0.5);
+  border-radius: 12px;
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.recipient-dropdown:hover,
+.recipient-dropdown:focus {
+  border-color: #4cc9f0;
+  box-shadow: 0 0 15px rgba(76, 201, 240, 0.4);
+  outline: none;
+}
+
+.btn-send {
+  background: linear-gradient(90deg, #3a0ca3, #4cc9f0);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 14px 50px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(72, 191, 227, 0.4);
+  transition: all 0.3s ease;
+}
+
+.btn-send:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 30px rgba(72, 191, 227, 0.7);
+  background: linear-gradient(90deg, #4cc9f0, #3a0ca3);
+}
+
+.btn-send:active {
+  transform: translateY(-1px);
+}
+
+/* Error message styling */
+.error-message {
+  text-align: center;
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  min-height: 20px;
+}
+
+/* Messages list styling */
+.stego-messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.no-messages {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+  padding: 60px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+}
+
+/* Message card styling */
+.stego-message-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(15px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stego-message-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(72, 191, 227, 0.3);
+  border-color: rgba(76, 201, 240, 0.6);
+}
+
+.stego-message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.stego-message-from {
+  color: #4cc9f0;
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+}
+
+.stego-message-date {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.stego-message-card>div {
+  color: #ffffff;
+  margin-bottom: 15px;
+  font-size: 1rem;
+}
+
+.stego-message-card strong {
+  color: #4cc9f0;
+  margin-right: 8px;
+}
+
+/* Decrypt button */
+.decrypt-audio-btn {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 25px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.decrypt-audio-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+}
+
+.decrypt-audio-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Audio player styling */
+.audio-player {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 15px 0;
+}
+
+.audio-player audio {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 10px;
+  filter: hue-rotate(180deg) brightness(1.2);
+}
+
+.audio-info {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* Decrypted content */
+.decrypted-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, margin-top 0.5s ease, padding 0.5s ease;
+  background: linear-gradient(135deg, rgba(76, 201, 240, 0.2), rgba(58, 12, 163, 0.2));
+  border-radius: 12px;
+  border: 2px solid transparent;
+}
+
+.decrypted-content.show {
+  max-height: 500px;
+  margin-top: 20px;
+  padding: 20px;
+  border-color: rgba(76, 201, 240, 0.5);
+  animation: glowBorder 2s infinite ease-in-out;
+}
+
+@keyframes glowBorder {
+
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(76, 201, 240, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 25px rgba(76, 201, 240, 0.6);
+  }
+}
+
+.decrypted-content p {
+  color: #ffffff;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .send-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .recipient-select {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .recipient-dropdown {
+    max-width: 100%;
+  }
+
+  .stego-message-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .decrypt-audio-btn {
+    width: 100%;
+  }
+}
+
+/* Loading animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #4cc9f0;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}

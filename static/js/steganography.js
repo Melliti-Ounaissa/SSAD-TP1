@@ -67,6 +67,143 @@ uploadArea.addEventListener('drop', (e) => {
     }
 });
 
+// Create visualization modal
+function createVisualizationModal(analysis) {
+    const modal = document.createElement('div');
+    modal.className = 'visualization-modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔬 Analyse de la Stéganographie</h2>
+                <button class="modal-close" onclick="closeVisualizationModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                ${createAnalysisHTML(analysis)}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Close on outside click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeVisualizationModal();
+        }
+    });
+}
+
+function createAnalysisHTML(analysis) {
+    const original = analysis.original;
+    const modified = analysis.modified;
+    const lsb = analysis.lsb_comparison;
+    
+    let html = `
+        <div class="analysis-section">
+            <h3>📊 Informations Audio</h3>
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h4>Audio Original</h4>
+                    <table class="info-table">
+                        <tr><td>Canaux:</td><td>${original.channels}</td></tr>
+                        <tr><td>Fréquence:</td><td>${original.framerate} Hz</td></tr>
+                        <tr><td>Durée:</td><td>${original.duration.toFixed(2)}s</td></tr>
+                        <tr><td>Échantillons:</td><td>${original.n_frames.toLocaleString()}</td></tr>
+                        <tr><td>Capacité:</td><td>${original.capacity_chars} caractères</td></tr>
+                    </table>
+                </div>
+                
+                <div class="comparison-card">
+                    <h4>Audio Modifié</h4>
+                    <table class="info-table">
+                        <tr><td>Canaux:</td><td>${modified.channels}</td></tr>
+                        <tr><td>Fréquence:</td><td>${modified.framerate} Hz</td></tr>
+                        <tr><td>Durée:</td><td>${modified.duration.toFixed(2)}s</td></tr>
+                        <tr><td>Échantillons:</td><td>${modified.n_frames.toLocaleString()}</td></tr>
+                        <tr><td>Capacité:</td><td>${modified.capacity_chars} caractères</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="analysis-section">
+            <h3>💬 Message Caché</h3>
+            <div class="message-info">
+                <p><strong>Texte:</strong> "${analysis.message_hidden}"</p>
+                <p><strong>Longueur:</strong> ${analysis.message_length} caractères (${analysis.binary_length} bits)</p>
+                <p><strong>Utilisation:</strong> ${((analysis.binary_length / original.capacity_bits) * 100).toFixed(2)}% de la capacité</p>
+            </div>
+            <div class="binary-preview">
+                <strong>Représentation binaire:</strong>
+                <code>${lsb.binary_message}</code>
+            </div>
+        </div>
+        
+        <div class="analysis-section">
+            <h3>🔍 Modifications LSB (Échantillons: 1-${lsb.samples.length})</h3>
+            <div class="stats-summary">
+                <div class="stat-box">
+                    <div class="stat-value">${lsb.total_changes}</div>
+                    <div class="stat-label">Modifications</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">${lsb.change_percentage.toFixed(1)}%</div>
+                    <div class="stat-label">Taux de changement</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">±1</div>
+                    <div class="stat-label">Différence maximale</div>
+                </div>
+            </div>
+            
+            <div class="lsb-table-container">
+                <table class="lsb-table">
+                    <thead>
+                        <tr>
+                            <th>Index</th>
+                            <th>Original</th>
+                            <th>Modifié</th>
+                            <th>LSB Avant</th>
+                            <th>LSB Après</th>
+                            <th>Bit Message</th>
+                            <th>Changé?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${lsb.samples.map(sample => `
+                            <tr class="${sample.changed ? 'changed-row' : ''}">
+                                <td>${sample.index}</td>
+                                <td>${sample.original}</td>
+                                <td>${sample.modified}</td>
+                                <td><code>${sample.lsb_before}</code></td>
+                                <td><code>${sample.lsb_after}</code></td>
+                                <td><code>${sample.message_bit}</code></td>
+                                <td>${sample.changed ? '✓ OUI' : '✗ NON'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="explanation">
+                <p><strong>💡 Explication:</strong></p>
+                <p>La stéganographie LSB modifie le bit de poids faible (LSB) de chaque échantillon audio pour cacher un message. 
+                Ces modifications sont imperceptibles à l'oreille humaine car elles représentent une différence de ±1 sur des valeurs 
+                pouvant aller jusqu'à ±32768.</p>
+            </div>
+        </div>
+    `;
+    
+    return html;
+}
+
+function closeVisualizationModal() {
+    const modal = document.querySelector('.visualization-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
 // Send steganography message
 async function sendStegoMessage() {
     const secretMessage = secretMessageInput.value.trim();
@@ -93,7 +230,7 @@ async function sendStegoMessage() {
     formData.append('receiver_id', receiverId);
 
     try {
-        showError('Envoi en cours...');
+        showError('Envoi en cours...', 'info');
         const response = await fetch('/api/stego/send', {
             method: 'POST',
             body: formData
@@ -103,6 +240,14 @@ async function sendStegoMessage() {
 
         if (data.success) {
             showError('Message envoyé avec succès!', 'success');
+            
+            // Show visualization if analysis data is available
+            if (data.analysis) {
+                setTimeout(() => {
+                    createVisualizationModal(data.analysis);
+                }, 500);
+            }
+            
             secretMessageInput.value = '';
             selectedFile = null;
             fileInfo.textContent = '';
@@ -212,14 +357,14 @@ async function decryptStegoMessage(messageId, button) {
             button.textContent = '✓ Déchiffré';
             button.style.backgroundColor = '#28a745';
             
-            // Hide the decrypted message after 60 seconds (1 minute)
+            // Hide the decrypted message after 60 seconds
             setTimeout(() => {
                 decryptedDiv.classList.remove('show');
                 button.textContent = '🔓 Déchiffrer le message';
                 button.style.backgroundColor = '#0d214f';
                 button.disabled = false;
                 messageP.textContent = '';
-            }, 60000); // 60000ms = 60 seconds = 1 minute
+            }, 60000);
         } else {
             alert('Erreur: ' + data.message);
             button.disabled = false;
@@ -237,6 +382,8 @@ function showError(message, type = 'error') {
     sendErrorMessage.textContent = message;
     if (type === 'success') {
         sendErrorMessage.style.color = '#28a745';
+    } else if (type === 'info') {
+        sendErrorMessage.style.color = '#0d214f';
     } else {
         sendErrorMessage.style.color = '#dc3545';
     }

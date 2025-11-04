@@ -39,7 +39,11 @@ function createKeyInputs() {
                 </div>
                 <div class="key-input-group">
                     <label>Direction:</label>
-                    <select id="caesar-direction">
+                    <select id="caesar-direction" style="
+                            border-radius: 5px;
+                            padding: 5px 10px;
+                            font-size: 1rem;
+                            ">
                         <option value="droite">Droite →</option>
                         <option value="gauche">Gauche ←</option>
                     </select>

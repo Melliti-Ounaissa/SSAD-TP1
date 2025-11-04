@@ -8,6 +8,7 @@ from backend.password_attack_service import PasswordAttackService
 import os
 import json
 from dotenv import load_dotenv
+import wave
 
 load_dotenv()
 
@@ -128,11 +129,16 @@ def signin():
 
     result = auth_service.sign_in(username, password)
 
-    if result['success']:
+    if result.get('success'):
         session['user'] = result['user']
         return jsonify(result), 200
-    else:
-        return jsonify(result), 400
+
+    msg = (result.get('message') or '').lower()
+    if "verrouill" in msg or "locked" in msg:
+        return jsonify(result), 423  # compte verrouillé
+    return jsonify(result), 401       # mauvais mot de passe
+
+
 
 
 @app.route('/api/users', methods=['GET'])
@@ -245,55 +251,72 @@ def send_stego_message():
 
     if not file or not secret_message or not receiver_id:
         return jsonify({"success": False, "message": "Audio file, message, and receiver are required"}), 400
-
     if file.filename == '':
         return jsonify({"success": False, "message": "No file selected"}), 400
 
     if not allowed_file(file.filename):
         return jsonify({"success": False, "message": "Only WAV files are allowed"}), 400
 
+    temp_path = None  # Pour le cleanup
+
     try:
         sender_id = session['user']['id']
-        
-        # Validate WAV file before processing
-        temp_path = os.path.join(app.config['UPLOAD_FOLDER'], f'temp_{sender_id}.wav')
+
+        #Créer un fichier temporaire
+        import time
+        timestamp = int(time.time() * 1000)  # Millisecondes pour unicité
+        temp_path = os.path.join(app.config['UPLOAD_FOLDER'], f'temp{sender_id}{timestamp}.wav')
+        #Sauvegarder le fichier uploadé
         file.save(temp_path)
-        
-        # Check if it's a valid WAV file
+
+        #Valider le fichier WAV (avec fermeture automatique)
         try:
-            import wave
             with wave.open(temp_path, 'rb') as wav:
                 frames = wav.getnframes()
                 rate = wav.getframerate()
                 duration = frames / float(rate)
                 print(f"Audio file validated: {duration:.2f} seconds, {frames} frames")
-                
-                # Ensure audio is long enough for message
+
+#Vérifier la capacité
                 message_bits = len(secret_message + "###END###") * 8
                 if frames < message_bits:
-                    os.remove(temp_path)
                     return jsonify({
                         "success": False, 
-                        "message": f"Audio too short! Need at least {message_bits} samples for this message. Audio has {frames} samples."
+                        "message": f"Audio trop court ! Besoin de {message_bits} échantillons, l'audio en a {frames}."
                     }), 400
+            # Fichier WAV est maintenant FERMÉ grâce au 'with'
+
         except wave.Error as e:
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-            return jsonify({"success": False, "message": f"Invalid WAV file: {str(e)}"}), 400
-        
-        # Process with steganography
+            return jsonify({"success": False, "message": f"Fichier WAV invalide: {str(e)}"}), 400
+
+#IMPORTANT : Petit délai pour s'assurer que Windows libère le fichier
+        import time
+        time.sleep(0.1)
+
+    #Traiter avec stéganographie
         result = stego_service.hide_message_and_save_from_temp(
             temp_path, secret_message, sender_id, receiver_id, app.config['UPLOAD_FOLDER']
         )
-        
-        # Clean up temp file
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
-        
+
         return jsonify(result), 200
+
     except Exception as e:
         print(f"Error in stego send: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        # Nettoyer le fichier temporaire dans TOUS les cas
+        if temp_path and os.path.exists(temp_path):
+            try:
+                # Attendre un peu pour que Windows libère le fichier
+                import time
+                time.sleep(0.2)
+                os.remove(temp_path)
+                print(f"✅ Fichier temporaire supprimé : {temp_path}")
+            except Exception as e:
+                print(f"⚠️ Impossible de supprimer le fichier temporaire : {e}")
+                # Ne pas faire échouer la requête juste pour ça
 
 
 @app.route('/api/stego/messages', methods=['GET'])
