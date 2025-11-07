@@ -183,14 +183,45 @@ def send_message():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
+# [REMPLACER l'ancienne route @app.route('/api/messages/conversation/<int:other_user_id>') DANS app.py]
+
 @app.route('/api/messages/conversation/<int:other_user_id>', methods=['GET'])
 def get_conversation(other_user_id):
     if 'user' not in session:
         return jsonify({"success": False, "message": "Unauthorized"}), 401
 
     user_id = session['user']['id']
-    result = message_service.get_conversation(user_id, other_user_id)
-    return jsonify(result), 200
+    
+    all_messages = []
+
+    # 1. Get Crypto Messages
+    crypto_result = message_service.get_conversation(user_id, other_user_id)
+    if not crypto_result['success']:
+        print(f"Error fetching crypto messages: {crypto_result['message']}")
+        # Continue even if one type fails, or return error
+    else:
+        for msg in crypto_result.get('messages', []):
+            msg['message_type'] = 'crypto'
+            all_messages.append(msg)
+            
+    # 2. Get Stego Messages
+    # (Assurez-vous d'avoir ajouté get_conversation_messages à StegoService)
+    stego_result = stego_service.get_conversation_messages(user_id, other_user_id)
+    if not stego_result['success']:
+        print(f"Error fetching stego messages: {stego_result['message']}")
+    else:
+        for msg in stego_result.get('messages', []):
+            msg['message_type'] = 'stego'
+            all_messages.append(msg)
+    
+    # 3. Merge and Sort
+    try:
+        all_messages.sort(key=lambda x: x['date_created'])
+    except Exception as e:
+        print(f"Error sorting messages: {e}")
+        # Handle potential timezone vs non-timezone date issues if they arise
+
+    return jsonify({"success": True, "messages": all_messages}), 200
 
 
 @app.route('/api/messages/all', methods=['GET'])

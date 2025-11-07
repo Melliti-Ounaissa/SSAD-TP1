@@ -257,3 +257,27 @@ class StegoService:
 
         except Exception as e:
             return {"success": False, "message": f"Error: {str(e)}"}
+        
+        
+        # [AJOUTER CETTE MÉTHODE DANS stego_service.py, à l'intérieur de la classe StegoService]
+
+    def get_conversation_messages(self, user1_id, user2_id):
+        '''Get all steganography messages between two specific users'''
+        try:
+            result = self.supabase.table('stego_messages').select(
+                '''
+                id,
+                date_created,
+                audio_filename,
+                sender_id,
+                receiver_id,
+                sender:users!stego_messages_sender_id_fkey(id, username),
+                receiver:users!stego_messages_receiver_id_fkey(id, username)
+                '''
+            ).or_(
+                f'and(sender_id.eq.{user1_id},receiver_id.eq.{user2_id}),and(sender_id.eq.{user2_id},receiver_id.eq.{user1_id})'
+            ).order('date_created', desc=False).execute()
+
+            return {"success": True, "messages": result.data if result.data else []}
+        except Exception as e:
+            return {"success": False, "message": f"Error: {str(e)}", "messages": []}
