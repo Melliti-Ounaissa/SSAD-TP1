@@ -8,8 +8,7 @@ A Python web application demonstrating classical cryptography algorithms with re
 - Classical cryptography algorithms:
   - Caesar Cipher (shift = 3)
   - Affine Cipher (a=5, b=8)
-  - Hill Cipher (3x3 matrix)
-  - Playfair Cipher (key="MONARCHY")
+  - Hill Cipher 
 - Real-time encrypted messaging between users
 - Message history (sent/received)
 - Visual encryption/decryption demonstration
@@ -38,6 +37,7 @@ pip install -r requirements.txt
 
 ### 3. Configure Environment
 
+Create `.env` file.
 Ensure your `.env` file has:
 ```
 VITE_SUPABASE_URL=your_supabase_url
@@ -47,16 +47,14 @@ VITE_SUPABASE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ### 4. Run the Web Application
 
 ```bash
-python run_webapp.py
+python app.py
 ```
 
 Then open your browser to: **http://localhost:5000**
 
 ## Full Documentation
 
-- `WEB_APP_SETUP.md` - Complete web app setup and usage guide
-- `DATABASE_SETUP.md` - Database configuration instructions
-- `SETUP_AND_RUN.md` - Original desktop app documentation (legacy)
+- `DATABASE_SETUP.md` - Database configuration instructions(legacy)
 
 ## Technology Stack
 

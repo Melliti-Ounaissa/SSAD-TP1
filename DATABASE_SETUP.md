@@ -12,66 +12,13 @@ You need to manually set up the database tables in your Supabase dashboard. Foll
 
 ### 2. Run the Following SQL Script
 
-Copy and paste this entire SQL script into the SQL editor and execute it:
-
-```sql
--- Create users table with integer ID
-CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(50) UNIQUE NOT NULL,
-  password VARCHAR(50) NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Create messages table with integer ID
-CREATE TABLE IF NOT EXISTS messages (
-  id SERIAL PRIMARY KEY,
-  date_created TIMESTAMPTZ DEFAULT now(),
-  content VARCHAR(200) NOT NULL,
-  encrypted VARCHAR(200) NOT NULL,
-  algo_name VARCHAR(10) NOT NULL,
-  sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  receiver_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Create indexes for better query performance
-CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
-CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id);
-CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(date_created DESC);
-
--- Enable Row Level Security
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
-
--- Users table policies
-CREATE POLICY "Users can read own profile"
-  ON users FOR SELECT
-  USING (true);
-
-CREATE POLICY "Users can insert during signup"
-  ON users FOR INSERT
-  WITH CHECK (true);
-
--- Messages table policies
-CREATE POLICY "Users can view their sent messages"
-  ON messages FOR SELECT
-  USING (sender_id IN (SELECT id FROM users));
-
-CREATE POLICY "Users can view their received messages"
-  ON messages FOR SELECT
-  USING (receiver_id IN (SELECT id FROM users));
-
-CREATE POLICY "Users can insert messages they send"
-  ON messages FOR INSERT
-  WITH CHECK (sender_id IN (SELECT id FROM users));
-```
+Copy and paste the entire SQL script from the database_migration.sql into the SQL editor and execute it.
 
 ### 3. Verify Tables Created
 
 After running the script:
 1. Go to the "Table Editor" in your Supabase dashboard
-2. You should see two tables: `users` and `messages`
+2. You should see three tables: `users`  `messages` `stego_messages`
 3. Click on each table to verify the columns are created correctly
 
 ### 4. Update Environment Variables
@@ -97,6 +44,14 @@ VITE_SUPABASE_SUPABASE_ANON_KEY=your_supabase_anon_key
 - `content`: Original message content (max 200 characters)
 - `encrypted`: Encrypted message content (max 200 characters)
 - `algo_name`: Algorithm used (max 10 characters): ceasar, affine, hill, playfair
+- `sender_id`: Foreign key to users.id
+- `receiver_id`: Foreign key to users.id
+- `created_at`: Timestamp when record was created
+
+### Stego_Messages Table (Steganography)
+- `id`: Auto-incrementing integer, primary key
+- `date_created` : Timestamp when message was created
+-`audio_filename` : Name of the audio file containing the hidden message (max 255 characters)
 - `sender_id`: Foreign key to users.id
 - `receiver_id`: Foreign key to users.id
 - `created_at`: Timestamp when record was created

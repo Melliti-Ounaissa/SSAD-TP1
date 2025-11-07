@@ -3,55 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cryptography Toolkit - {{ algorithm|capitalize }}</title>
+    <title>{{ algorithm|capitalize }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <style>
-        .key-inputs-section {
-            background-color: #f8f9fa;
-            border: 2px solid #d0d0d0;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .key-inputs-section h3 {
-            color: #0d214f;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-        
-        #key-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .key-input-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .key-input-group label {
-            font-weight: bold;
-            color: #333;
-            min-width: 150px;
-        }
-        
-        .key-input-group input {
-            padding: 10px 15px;
-            border: 2px solid #d0d0d0;
-            border-radius: 8px;
-            font-size: 1rem;
-            flex: 1;
-            max-width: 300px;
-        }
-        
-        .key-input-group input:focus {
-            outline: none;
-            border-color: #4a90e2;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/encryption.css') }}">
+    
 </head>
 <body>
     <div class="app-container">
@@ -59,19 +14,31 @@
             <button class="back-button" onclick="window.location.href='/home'">←</button>
 
             <nav class="nav-menu">
-                <a href="/messages" class="nav-item">
-                    <span class="nav-icon">📧</span>
-                    <span class="nav-text">Messages</span>
-                </a>
-                <a href="/algorithms" class="nav-item">
-                    <span class="nav-icon">🧠</span>
-                    <span class="nav-text">Algorithmes<br>de Cryptage</span>
-                </a>
-                <a href="/steganography" class="nav-item">
-                    <span class="nav-icon">🎵</span>
-                    <span class="nav-text">Stéganographie</span>
-                </a>
-            </nav>
+          <a href="/messages" class="nav-item">
+            <span class="nav-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12.36 4C6.58 4 2.644 9.857 4.824 15.21l.933 2.288a.5.5 0 0 1-.15.579L3.634 19.66a.5.5 0 0 0 .313.89h7.82a8.73 8.73 0 0 0 8.733-8.732C20.5 7.5 17 4 12.682 4z"/></svg>
+            </span>
+            <span class="nav-text">Messages</span>
+          </a>
+          <a href="/algorithms" class="nav-item">
+            <span class="nav-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M10.825 22q-.675 0-1.162-.45t-.588-1.1L8.85 18.8q-.325-.125-.612-.3t-.563-.375l-1.55.65q-.625.275-1.25.05t-.975-.8l-1.175-2.05q-.35-.575-.2-1.225t.675-1.075l1.325-1Q4.5 12.5 4.5 12.337v-.675q0-.162.025-.337l-1.325-1Q2.675 9.9 2.525 9.25t.2-1.225L3.9 5.975q.35-.575.975-.8t1.25.05l1.55.65q.275-.2.575-.375t.6-.3l.225-1.65q.1-.65.588-1.1T10.825 2h2.35q.675 0 1.163.45t.587 1.1l.225 1.65q.325.125.613.3t.562.375l1.55-.65q.625-.275 1.25-.05t.975.8l1.175 2.05q.35.575.2 1.225t-.675 1.075l-1.325 1q.025.175.025.338v.674q0 .163-.05.338l1.325 1q.525.425.675 1.075t-.2 1.225l-1.2 2.05q-.35.575-.975.8t-1.25-.05l-1.5-.65q-.275.2-.575.375t-.6.3l-.225 1.65q-.1.65-.587 1.1t-1.163.45zm1.225-6.5q1.45 0 2.475-1.025T15.55 12t-1.025-2.475T12.05 8.5q-1.475 0-2.488 1.025T8.55 12t1.013 2.475T12.05 15.5"/></svg>
+            </span>
+            <span class="nav-text">Algorithmes<br />de Cryptage</span>
+          </a>
+          <a href="/steganography" class="nav-item">
+            <span class="nav-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.25a.75.75 0 0 0-.75.75v11.26a4.25 4.25 0 1 0 1.486 2.888A1 1 0 0 0 12.75 17V7.75H18a2.75 2.75 0 1 0 0-5.5z"/></svg>
+            </span>
+            <span class="nav-text">Stéganographie</span>
+          </a>
+          <a href=# class="nav-item">
+            <span class="nav-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M9.73 3.993a2.75 2.75 0 0 1 4.54 0l.432.632a76 76 0 0 1 6.944 12.563l.09.208a2.51 2.51 0 0 1-2.024 3.497a69.4 69.4 0 0 1-15.424 0a2.51 2.51 0 0 1-2.024-3.497l.09-.208A76 76 0 0 1 9.298 4.625zM13 9a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-1 2.75a.75.75 0 0 1 .75.75v5a.75.75 0 1 1-1.5 0v-5a.75.75 0 0 1 .75-.75" clip-rule="evenodd"/></svg>
+            </span>
+            <span class="nav-text">Attaques</span>
+          </a>
+        </nav>
         </aside>
 
         <main class="main-content">
@@ -81,7 +48,7 @@
 
             <!-- Key Input Section -->
             <div class="key-inputs-section">
-                <h3>⚙️ Configuration de la clé</h3>
+                <h3><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25.0" viewBox="0 0 32 32"><g fill="none"><path fill="url(#SVGoyKD4A3p)" d="M28.832 18.472a1.48 1.48 0 0 1 .537 1.634a14.3 14.3 0 0 1-3.156 5.443a1.48 1.48 0 0 1-1.671.347l-1.955-.858a1.5 1.5 0 0 0-.68-.128a1.5 1.5 0 0 0-.66.2a1.47 1.47 0 0 0-.727 1.124l-.235 2.13a1.48 1.48 0 0 1-1.13 1.276c-2.076.495-4.24.495-6.316 0a1.48 1.48 0 0 1-1.125-1.27l-.235-2.126a1.48 1.48 0 0 0-.485-.94a1.5 1.5 0 0 0-1.58-.255l-1.955.859a1.48 1.48 0 0 1-1.668-.343a14.3 14.3 0 0 1-3.16-5.45a1.48 1.48 0 0 1 .536-1.632l1.725-1.275a1.488 1.488 0 0 0 0-2.4l-1.725-1.273a1.48 1.48 0 0 1-.536-1.623A14.25 14.25 0 0 1 5.79 6.467c.14-.151.31-.271.5-.351a1.5 1.5 0 0 1 1.17 0l1.947.858a1.493 1.493 0 0 0 2.073-1.206l.236-2.122a1.48 1.48 0 0 1 1.148-1.281a15.5 15.5 0 0 1 3.146-.362c1.052.012 2.1.133 3.127.362a1.48 1.48 0 0 1 1.147 1.284l.236 2.12a1.483 1.483 0 0 0 2.067 1.2l1.946-.857a1.48 1.48 0 0 1 1.674.346a14.2 14.2 0 0 1 3.157 5.44a1.48 1.48 0 0 1-.537 1.63l-1.72 1.273a1.48 1.48 0 0 0-.004 2.395zM16 20a4 4 0 1 0 0-8a4 4 0 0 0 0 8"/><defs><linearGradient id="SVGoyKD4A3p" x1="22.717" x2="7.059" y1="28.927" y2="4.523" gradientUnits="userSpaceOnUse"><stop stop-color="#70777d"/><stop offset="1" stop-color="#b9c0c7"/></linearGradient></defs></g></svg> Configuration de la clé</h3>
                 <div id="key-inputs">
                     <!-- Key inputs will be populated by JavaScript -->
                 </div>
@@ -96,17 +63,17 @@
 
             <div class="transmission-container">
                 <div class="sender-section">
-                    <div class="computer-icon">💻</div>
+                    <div class="computer-icon"><svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 128 128"><path fill="#b7d5e5" d="M71.59 68.58H58.75c0 20.36-4.21 28.52-4.21 28.52H75.8c0-.01-4.21-8.17-4.21-28.52"/><path fill="#2f7889" d="M39.41 98.17c-.07-1.14.1-2.64.1-2.64s45.24-1.88 48.83-.09c0 0 .48 1.66.15 2.74c-.79 2.53-10.99 4.8-24.55 4.8s-24.37-2.16-24.53-4.81"/><ellipse cx="64" cy="95.96" fill="#b7d5e5" rx="24.55" ry="4.8"/><path fill="#69a1ba" d="M71.59 68.58H58.75c0 6.64-.45 11.98-1.05 16.16l15.31 2.3c-.78-4.47-1.42-10.54-1.42-18.46"/><path fill="#eee" d="M55.49 91.46s-3.72 1.52-2.88 2.63c1.3 1.74 4.93 2.83 13.71 3.42c6.17.41 3.75 2.13-2.05 2.48c-4.07.24-23.58.4-24.74-3.67c-.94-3.31 13.18-4.86 15.96-4.86m43.91 15.05H28.49c-.97 0-1.94.54-2.48 1.4l-7.78 10.7c-.72.98-.01 2.36 1.2 2.36h89.13c1.22 0 1.92-1.38 1.2-2.36l-7.88-10.8c-.53-.76-1.5-1.3-2.48-1.3"/><path fill="#69a1ba" d="M35.61 111.26h-4.86l.65-1.18h4.86zm7.67 0h-4.86l.54-1.18h5.07zm7.34 0h-4.97l.76-1.18h4.85zm7.23 0h-4.86l.76-1.18h4.64zm7.23 0h-4.97l.44-1.18h4.1zm7.23 0h-4.86l-.54-1.18h4.65zm7.56 0H74.9l-.86-1.18h4.86zm7.23 0h-4.97l-.86-1.18h4.97zm9.82 0h-7.45l-.86-1.18h7.56zm-3.78 1.95H98l-.86-1.3h-4.97zm-7.98 0h4.85l-.97-1.3h-4.86zm-7.34 0h4.85l-.75-1.3h-4.97zm-7.88 0h4.85l-.86-1.3h-4.64zm-7.02 0h4.86l-.54-1.3h-4.1zm-7.02 0h4.86l.33-1.3h-4.75zm-7.66 0h4.86l.65-1.3H49zm-8.63 0h4.96l.76-1.3h-4.97zm-9.93 0h7.34l.75-1.3h-7.45zm46.41 1.94h4.96l-.86-1.3h-4.96zm-7.77 0h4.85l-.64-1.3h-4.64zm-9.29 0H64l-.11-1.3h-4.42zm-8.74 0h4.97l.43-1.3h-4.75zm-9.17 0h4.85l.76-1.3h-4.86zm-12.42 0h9.83l.75-1.3h-9.82zm55.7 0h14.68l-.86-1.3H83.54zm11.12 1.94h4.96l-.97-1.29h-4.96zm-9.07 0h4.86l-.97-1.29h-4.86zm-39.18 0h33.35l-.75-1.29H48.02zm-10.47 0h4.96l.54-1.29h-4.75zm-9.28 0h4.85l.54-1.29h-4.75z" opacity="0.57"/><path fill="#2f7889" d="M108.69 124H19.31c-.88 0-1.64-.76-1.64-1.62v-2.4h92.68v2.4c-.01.86-.78 1.62-1.66 1.62"/><path fill="#b7d5e5" d="M99.4 107.52c.61 0 1.3.36 1.67.88l8.22 11.27c.05.06.05.13.02.2c-.04.07-.09.1-.17.1H18.86c-.08 0-.13-.03-.17-.1a.17.17 0 0 1 .02-.2l8.12-11.16l.02-.03l.02-.03c.35-.57.99-.93 1.63-.93zm0-1.01H28.49c-.97 0-1.94.54-2.48 1.4l-8.12 11.16c-.57.79-.01 1.9.97 1.9h90.29c.98 0 1.54-1.11.97-1.9l-8.22-11.27c-.55-.75-1.52-1.29-2.5-1.29"/><path fill="#69a1ba" d="M113.46 79.66H14.54a3.44 3.44 0 0 1-3.44-3.44v-67c0-1.9 1.54-3.44 3.44-3.44h98.91c1.9 0 3.44 1.54 3.44 3.44v67c.01 1.9-1.53 3.44-3.43 3.44"/><path fill="#b7d5e5" d="M113.46 77.89H14.54a3.44 3.44 0 0 1-3.44-3.44v-67c0-1.9 1.54-3.44 3.44-3.44h98.91c1.9 0 3.44 1.54 3.44 3.44v67a3.43 3.43 0 0 1-3.43 3.44"/><radialGradient id="SVGwVq27zVB" cx="46.465" cy="-5.176" r="60.973" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2f7889"/><stop offset="1" stop-color="#424242"/></radialGradient><path fill="url(#SVGwVq27zVB)" d="M15.25 9.38h97.5V72.5h-97.5z"/><path fill="none" stroke="#eee" stroke-linecap="round" stroke-miterlimit="10" stroke-width="3.014" d="M16.39 6.99h11.19"/></svg></div>
                     <label class="section-label">votre message</label>
                     <textarea id="message-input" class="message-input" placeholder="Entrez votre message..."></textarea>
                 </div>
 
                 <div class="transmission-line">
-                    ━━━━━━━━━━→
+                    <svg style="padding: 10px; margin-bottom: 100px;" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 12l-5-5m5 5l-5 5m5-5H3"/></svg>
                 </div>
 
                 <div class="receiver-section">
-                    <div class="computer-icon">💻</div>
+                    <div class="computer-icon"><svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 128 128"><path fill="#b7d5e5" d="M71.59 68.58H58.75c0 20.36-4.21 28.52-4.21 28.52H75.8c0-.01-4.21-8.17-4.21-28.52"/><path fill="#2f7889" d="M39.41 98.17c-.07-1.14.1-2.64.1-2.64s45.24-1.88 48.83-.09c0 0 .48 1.66.15 2.74c-.79 2.53-10.99 4.8-24.55 4.8s-24.37-2.16-24.53-4.81"/><ellipse cx="64" cy="95.96" fill="#b7d5e5" rx="24.55" ry="4.8"/><path fill="#69a1ba" d="M71.59 68.58H58.75c0 6.64-.45 11.98-1.05 16.16l15.31 2.3c-.78-4.47-1.42-10.54-1.42-18.46"/><path fill="#eee" d="M55.49 91.46s-3.72 1.52-2.88 2.63c1.3 1.74 4.93 2.83 13.71 3.42c6.17.41 3.75 2.13-2.05 2.48c-4.07.24-23.58.4-24.74-3.67c-.94-3.31 13.18-4.86 15.96-4.86m43.91 15.05H28.49c-.97 0-1.94.54-2.48 1.4l-7.78 10.7c-.72.98-.01 2.36 1.2 2.36h89.13c1.22 0 1.92-1.38 1.2-2.36l-7.88-10.8c-.53-.76-1.5-1.3-2.48-1.3"/><path fill="#69a1ba" d="M35.61 111.26h-4.86l.65-1.18h4.86zm7.67 0h-4.86l.54-1.18h5.07zm7.34 0h-4.97l.76-1.18h4.85zm7.23 0h-4.86l.76-1.18h4.64zm7.23 0h-4.97l.44-1.18h4.1zm7.23 0h-4.86l-.54-1.18h4.65zm7.56 0H74.9l-.86-1.18h4.86zm7.23 0h-4.97l-.86-1.18h4.97zm9.82 0h-7.45l-.86-1.18h7.56zm-3.78 1.95H98l-.86-1.3h-4.97zm-7.98 0h4.85l-.97-1.3h-4.86zm-7.34 0h4.85l-.75-1.3h-4.97zm-7.88 0h4.85l-.86-1.3h-4.64zm-7.02 0h4.86l-.54-1.3h-4.1zm-7.02 0h4.86l.33-1.3h-4.75zm-7.66 0h4.86l.65-1.3H49zm-8.63 0h4.96l.76-1.3h-4.97zm-9.93 0h7.34l.75-1.3h-7.45zm46.41 1.94h4.96l-.86-1.3h-4.96zm-7.77 0h4.85l-.64-1.3h-4.64zm-9.29 0H64l-.11-1.3h-4.42zm-8.74 0h4.97l.43-1.3h-4.75zm-9.17 0h4.85l.76-1.3h-4.86zm-12.42 0h9.83l.75-1.3h-9.82zm55.7 0h14.68l-.86-1.3H83.54zm11.12 1.94h4.96l-.97-1.29h-4.96zm-9.07 0h4.86l-.97-1.29h-4.86zm-39.18 0h33.35l-.75-1.29H48.02zm-10.47 0h4.96l.54-1.29h-4.75zm-9.28 0h4.85l.54-1.29h-4.75z" opacity="0.57"/><path fill="#2f7889" d="M108.69 124H19.31c-.88 0-1.64-.76-1.64-1.62v-2.4h92.68v2.4c-.01.86-.78 1.62-1.66 1.62"/><path fill="#b7d5e5" d="M99.4 107.52c.61 0 1.3.36 1.67.88l8.22 11.27c.05.06.05.13.02.2c-.04.07-.09.1-.17.1H18.86c-.08 0-.13-.03-.17-.1a.17.17 0 0 1 .02-.2l8.12-11.16l.02-.03l.02-.03c.35-.57.99-.93 1.63-.93zm0-1.01H28.49c-.97 0-1.94.54-2.48 1.4l-8.12 11.16c-.57.79-.01 1.9.97 1.9h90.29c.98 0 1.54-1.11.97-1.9l-8.22-11.27c-.55-.75-1.52-1.29-2.5-1.29"/><path fill="#69a1ba" d="M113.46 79.66H14.54a3.44 3.44 0 0 1-3.44-3.44v-67c0-1.9 1.54-3.44 3.44-3.44h98.91c1.9 0 3.44 1.54 3.44 3.44v67c.01 1.9-1.53 3.44-3.43 3.44"/><path fill="#b7d5e5" d="M113.46 77.89H14.54a3.44 3.44 0 0 1-3.44-3.44v-67c0-1.9 1.54-3.44 3.44-3.44h98.91c1.9 0 3.44 1.54 3.44 3.44v67a3.43 3.43 0 0 1-3.43 3.44"/><radialGradient id="SVGwVq27zVB" cx="46.465" cy="-5.176" r="60.973" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2f7889"/><stop offset="1" stop-color="#424242"/></radialGradient><path fill="url(#SVGwVq27zVB)" d="M15.25 9.38h97.5V72.5h-97.5z"/><path fill="none" stroke="#eee" stroke-linecap="round" stroke-miterlimit="10" stroke-width="3.014" d="M16.39 6.99h11.19"/></svg></div>
                     <label class="section-label">message reçu</label>
                     <div class="message-output" id="decrypted-display">
                         Le message déchiffré apparaîtra ici...

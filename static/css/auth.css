@@ -37,6 +37,7 @@ body {
 /* Container principal */
 .container {
   display: flex;
+  /* Assure que les sections sont côte à côte */
   width: 90%;
   max-width: 1100px;
   background: rgba(255, 255, 255, 0.1);
@@ -49,7 +50,8 @@ body {
 
 /* Section gauche (formulaire) */
 .left-section {
-  flex: 1;
+  flex: 1.5;
+  /* Donne plus d'espace au formulaire (ratio 60%) */
   padding: 60px;
   display: flex;
   flex-direction: column;
@@ -86,6 +88,47 @@ h1 {
 /* Champs d'entrée */
 .input-group {
   margin-bottom: 20px;
+}
+
+/* Input with icon container */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon .user-icon {
+  position: absolute;
+  left: 15px;
+  color: rgba(255, 255, 255, 0.6);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  transition: color 0.3s ease;
+}
+
+.input-with-icon input {
+  padding-left: 45px;
+}
+
+.input-with-icon input:focus+.user-icon,
+.input-with-icon input:focus+.lock-icon-input {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.password-input-group .input-with-icon input {
+  padding-right: 50px;
+  /* Space for the eye icon */
+}
+
+.lock-icon-input {
+  position: absolute;
+  left: 15px;
+  color: rgba(255, 255, 255, 0.6);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  transition: color 0.3s ease;
 }
 
 /* Enhanced password input group styling with modern eye icon */
@@ -229,6 +272,7 @@ input:focus {
 /* Section droite (illustration) */
 .right-section {
   flex: 1;
+  /* L'illustration prend moins d'espace (ratio 40%) */
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
   backdrop-filter: blur(20px);
   display: flex;
@@ -245,8 +289,10 @@ input:focus {
 
 .lock-icon {
   font-size: 6rem;
-  color: #4cc9f0;
-  text-shadow: 0 0 15px rgba(76, 201, 240, 0.6);
+  color: #fff;
+  /* L'icône est maintenant blanche */
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+  /* Ombre blanche pour effet néon */
   animation: float 3s ease-in-out infinite;
 }
 
@@ -270,26 +316,29 @@ input:focus {
   letter-spacing: 0.5px;
 }
 
-/* Effets responsive */
+/* Effets responsive (Mobile) */
 @media (max-width: 900px) {
   .container {
-    flex-direction: column;
     width: 95%;
+  }
+
+  .left-section {
+    flex: 0 0 100%;
+    /* Force la section de gauche à prendre 100% de la largeur */
+    padding: 40px 30px;
   }
 
   .right-section {
     display: none;
-  }
-
-  .left-section {
-    padding: 40px 30px;
+    /* Cache la section de droite pour ne pas qu'elle apparaisse en dessous */
   }
 
   h1 {
     font-size: 2rem;
   }
 }
-/* Add to auth.css */
+
+/* Section d'attaque */
 .attack-section {
   margin-top: 30px;
   text-align: center;
