@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Toolkit - {{ algorithm|capitalize }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .key-inputs-section {
+            background-color: #f8f9fa;
+            border: 2px solid #d0d0d0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .key-inputs-section h3 {
+            color: #0d214f;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        #key-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .key-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .key-input-group label {
+            font-weight: bold;
+            color: #333;
+            min-width: 150px;
+        }
+        
+        .key-input-group input {
+            padding: 10px 15px;
+            border: 2px solid #d0d0d0;
+            border-radius: 8px;
+            font-size: 1rem;
+            flex: 1;
+            max-width: 300px;
+        }
+        
+        .key-input-group input:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <button class="back-button" onclick="window.location.href='/home'">←</button>
+
+            <nav class="nav-menu">
+                <a href="/messages" class="nav-item">
+                    <span class="nav-icon">📧</span>
+                    <span class="nav-text">Messages</span>
+                </a>
+                <a href="/algorithms" class="nav-item">
+                    <span class="nav-icon">🧠</span>
+                    <span class="nav-text">Algorithmes<br>de Cryptage</span>
+                </a>
+                <a href="/steganography" class="nav-item">
+                    <span class="nav-icon">🎵</span>
+                    <span class="nav-text">Stéganographie</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="algorithm-header">
+                <h1 class="algorithm-title">{{ algorithm|capitalize }}</h1>
+            </div>
+
+            <!-- Key Input Section -->
+            <div class="key-inputs-section">
+                <h3>⚙️ Configuration de la clé</h3>
+                <div id="key-inputs">
+                    <!-- Key inputs will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="encryption-section">
+                <label class="section-label">message chiffré</label>
+                <div class="encrypted-box" id="encrypted-display">
+                    Le message chiffré apparaîtra ici...
+                </div>
+            </div>
+
+            <div class="transmission-container">
+                <div class="sender-section">
+                    <div class="computer-icon">💻</div>
+                    <label class="section-label">votre message</label>
+                    <textarea id="message-input" class="message-input" placeholder="Entrez votre message..."></textarea>
+                </div>
+
+                <div class="transmission-line">
+                    ━━━━━━━━━━→
+                </div>
+
+                <div class="receiver-section">
+                    <div class="computer-icon">💻</div>
+                    <label class="section-label">message reçu</label>
+                    <div class="message-output" id="decrypted-display">
+                        Le message déchiffré apparaîtra ici...
+                    </div>
+                </div>
+            </div>
+
+            <div class="send-section">
+                <div class="recipient-select">
+                    <label>Destinataire:</label>
+                    <select id="recipient-select" class="recipient-dropdown">
+                        <option value="">Choisir un destinataire...</option>
+                    </select>
+                </div>
+                <button class="btn-send" onclick="sendMessage()">Envoyer</button>
+            </div>
+
+            <div class="error-message" id="error-message"></div>
+        </main>
+    </div>
+
+    <script>
+        const userId = {{ user.id }};
+        const algorithm = "{{ algorithm }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/encryption.js') }}"></script>
+</body>
+</html>

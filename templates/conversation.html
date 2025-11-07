@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conversation</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/conversation.css') }}"
+    />
+  </head>
+  <body><!-- Add this near the conversation title or in a convenient location -->
+    <div class="conversation-header">
+      <h2 id="conversation-title">Conversation</h2>
+      <button
+        id="refresh-btn"
+        class="btn btn-secondary"
+        onclick="manualRefresh()"
+      >
+        🔄 Actualiser
+      </button>
+    </div>
+    <div class="app-container">
+      <aside class="sidebar">
+        <button class="back-button" onclick="window.location.href='/home'">
+          ←
+        </button>
+
+        <nav class="nav-menu">
+          <a href="/messages" class="nav-item active">
+            <span class="nav-icon">📧</span>
+            <span class="nav-text">Messages</span>
+          </a>
+          <a href="/algorithms" class="nav-item">
+            <span class="nav-icon">🧠</span>
+            <span class="nav-text">Algorithmes<br />de Cryptage</span>
+          </a>
+          <a href="/steganography" class="nav-item">
+            <span class="nav-icon">🎵</span>
+            <span class="nav-text">Stéganographie</span>
+          </a>
+          <a href=# class="nav-item">
+            <span class="nav-icon">⚔️</span>
+            <span class="nav-text">Attaques</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <a href="/logout" class="logout-link">Se déconnecter</a>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="conversation-header">
+          <h2 id="conversation-title">Conversation</h2>
+        </div>
+
+        <div class="chat-container">
+          <div class="messages-area" id="messages-area">
+            <p class="no-messages">Aucun message pour le moment</p>
+          </div>
+
+          <div class="message-input-area">
+            <div class="algorithm-selector">
+              <label>Algorithm:</label>
+              <select id="algorithm-select">
+                <option value="ceasar">Caesar</option>
+                <option value="hill">Hill</option>
+                <option value="playfair">Playfair</option>
+              </select>
+            </div>
+
+            <div class="key-inputs" id="key-inputs">
+              <label>Shift:</label>
+              <input
+                type="number"
+                id="caesar-shift"
+                value="3"
+                min="1"
+                max="25"
+              />
+            </div>
+
+            <textarea
+              id="message-input"
+              placeholder="Type your message..."
+              rows="3"
+            ></textarea>
+            <button id="send-btn" class="btn-send">Send</button>
+          </div>
+        </div>
+      </main>
+    </div>
+    
+
+    <script>
+      const currentUserId = {{ user.id }};
+      const otherUserId = {{ other_user_id }};
+      // Auto-hide decrypted messages after 1 minute
+      const DECRYPT_DISPLAY_TIME = 60000; // 60 seconds = 1 minute
+    </script>
+    <script src="{{ url_for('static', filename='js/conversation.js') }}"></script>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Toolkit - Algorithms</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <button class="back-button" onclick="window.location.href='/home'">←</button>
+
+            <nav class="nav-menu">
+                <a href="/messages" class="nav-item">
+                    <span class="nav-icon">📧</span>
+                    <span class="nav-text">Messages</span>
+                </a>
+                <a href="/algorithms" class="nav-item active">
+                    <span class="nav-icon">🧠</span>
+                    <span class="nav-text">Algorithmes<br>de Cryptage</span>
+                </a>
+                <a href="/steganography" class="nav-item">
+                    <span class="nav-icon">🎵</span>
+                    <span class="nav-text">Stéganographie</span>
+                </a>
+                <a href=# class="nav-item">
+                     <span class="nav-icon">⚔️</span>
+                     <span class="nav-text">Attaques</span>
+                 </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1 class="page-title">Choisissez un algorithme de cryptage</h1>
+
+            <div class="algorithms-grid">
+                <button class="algorithm-card" onclick="window.location.href='/encryption/ceasar'">
+                    <span class="algorithm-name">Ceasar</span>
+                </button>
+                <button class="algorithm-card" onclick="window.location.href='/encryption/playfair'">
+                    <span class="algorithm-name">PlayFair</span>
+                </button>
+                <button class="algorithm-card" onclick="window.location.href='/encryption/hill'">
+                    <span class="algorithm-name">Hill</span>
+                </button>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

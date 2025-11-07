@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Toolkit - Welcome</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body>
+    <div class="landing-wrapper">
+
+        <!-- 🌈 HERO SECTION -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="logo">🔐</div>
+                <h1 class="title">
+                    Boîte à outils de<br>
+                    <span>Cryptographie Classique</span>
+                </h1>
+                <p class="subtitle">
+                    Explorez, cryptez et échangez des messages secrets grâce à nos algorithmes classiques et modernes.
+                </p>
+
+                <div class="cta-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='/auth'">Commencer</button>
+                    <button class="btn btn-secondary" onclick="window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'})">Découvrir</button>
+                </div>
+            </div>
+
+            <div class="hero-bg"></div>
+        </section>
+
+        <!-- ⚙️ FEATURES SECTION -->
+        <section class="features">
+            <h2 class="section-title">Fonctionnalités principales</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📧</div>
+                    <h3>Messagerie Sécurisée</h3>
+                    <p>Communiquez avec d'autres utilisateurs via des messages entièrement chiffrés.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>Algorithmes Classiques</h3>
+                    <p>Testez et comparez les algorithmes Caesar, Playfair, Affine, Hill et plus encore.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔑</div>
+                    <h3>Clés Personnalisées</h3>
+                    <p>Utilisez vos propres clés pour renforcer la confidentialité et la sécurité de vos messages.</p>
+                </div>
+            </div>
+        </section>
+
+        
+    </div>
+</body>
+</html>

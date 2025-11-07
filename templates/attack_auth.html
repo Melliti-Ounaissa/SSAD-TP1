@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Toolkit - Attaquer un compte</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/attack_auth.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <div class="form-container">
+                <h1>⚔️ Attaquer un compte</h1>
+
+                <div class="input-group">
+                    <input type="text" id="target-username" placeholder="Nom d'utilisateur cible" required>
+                </div>
+
+                <div class="attack-options">
+                    <h3>Méthode d'attaque:</h3>
+                    <div class="attack-option" data-method="dictionary3">
+                        <strong>📚 Attaque par Dictionnaire (3 char)</strong>
+                        <p>Teste les mots de passe de 3 caractères depuis une liste prédéfinie</p>
+                        <small style="opacity: 0.7;">⚡ Rapide - Utilise 'worldlist3.txt'</small>
+                    </div>
+
+                    <div class="attack-option" data-method="bruteforce5">
+                        <strong>💥 Attaque par Force Brute (5 char)</strong>
+                        <p>Teste toutes les combinaisons de 5 caractères (a-z, 0-9)</p>
+                        <small style="opacity: 0.7;">⚡ Modéré - 36^5 = 60.5 millions de combinaisons</small>
+                    </div>
+
+                    <div class="attack-option" data-method="bruteforce6">
+                        <strong>💥 Attaque par Force Brute (6 char)</strong>
+                        <p>Teste toutes les combinaisons de 6 caractères (a-z, A-Z, 0-9, +, *)</p>
+                        <small style="opacity: 0.7;">🐌 Très lent - 64^6 ≈ 68 milliards de combinaisons</small>
+                    </div>
+                    
+                </div>
+
+                <div class="error-message" id="error-message"></div>
+                <div class="success-message" id="success-message"></div>
+
+                <button class="btn btn-attack" id="start-attack">🚀 Lancer l'attaque</button>
+
+                <div class="attack-progress" id="attack-progress">
+                    <h4>Progression de l'attaque:</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div id="progress-text">0%</div>
+                    
+                    <div class="attack-log" id="attack-log">
+                        <div class="log-entry">Journal d'attaque...</div>
+                    </div>
+                </div>
+
+                <button class="btn back-btn" id="back-btn">← Retour à la connexion</button>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="image-container">
+                <div class="security-illustration">
+                    <div class="lock-icon">⚔️</div>
+                    <p>Mode Attaque</p>
+                    <small style="margin-top: 20px; opacity: 0.8;">
+                        Testez la sécurité des mots de passe<br>
+                        Éducatif uniquement
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/attack_auth.js') }}"></script>
+</body>
+</html>
