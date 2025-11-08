@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stéganographie Audio</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/steg.css') }}">
+
+
 </head>
 <body>
     <div class="app-container">
@@ -47,6 +50,7 @@
     Se déconnecter
   </a>
 </div>
+
         </aside>
 
         <main class="main-content">
@@ -96,7 +100,7 @@
     </div>
 
     <script>
-        const userId = {{ user.id }};
+        const userId = "{{ user.id }}";
     </script>
     <script src="{{ url_for('static', filename='js/steganography.js') }}"></script>
 </body>

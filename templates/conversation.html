@@ -13,7 +13,9 @@
       href="{{ url_for('static', filename='css/conversation.css') }}"
     />
   </head>
+
   <body>
+
     <div class="app-container">
       <aside class="sidebar">
         <button class="back-button" onclick="window.location.href='/home'">
@@ -21,6 +23,7 @@
         </button>
 
         <nav class="nav-menu">
+<<<<<<< HEAD
           <a href="/messages" class="nav-item">
             <span class="nav-icon">
               <svg
@@ -186,11 +189,11 @@
         </div>
       </main>
     </div>
-
     <script>
-      const currentUserId = {{ user.id }};
-      const otherUserId = {{ other_user_id }};
+      const currentUserId = "{{ user.id }}";
+      const otherUserId = "{{ other_user_id }}";
     </script>
     <script src="{{ url_for('static', filename='js/conversation.js') }}"></script>
   </body>
 </html>
+

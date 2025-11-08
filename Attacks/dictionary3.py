@@ -81,4 +81,6 @@ def dictionary_and_hybrid_attack(target_hash):
     return None
 
 # Execute the simulation
+
 dictionary_and_hybrid_attack(TARGET_HASH)
+

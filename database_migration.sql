@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS messages (
   encrypted VARCHAR(500) NOT NULL,
   algo_name VARCHAR(10) NOT NULL,
   algorithm_key VARCHAR(100),
+
   sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   receiver_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT now()
@@ -92,6 +93,8 @@ DROP POLICY IF EXISTS "allow updates for lockout" ON users;
 
 -- Policies for the users table
 CREATE POLICY "Users can read all profiles"
+
+
   ON users FOR SELECT
   USING (true);
 
@@ -138,3 +141,4 @@ CREATE POLICY "Users can insert stego messages they send"
   ON stego_messages FOR INSERT
   -- Keeping the original check to match the request's logic:
   WITH CHECK (sender_id IN (SELECT id FROM users));
+

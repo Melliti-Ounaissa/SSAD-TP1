@@ -19,6 +19,8 @@ Copy and paste the entire SQL script from the database_migration.sql into the SQ
 After running the script:
 1. Go to the "Table Editor" in your Supabase dashboard
 2. You should see three tables: `users`  `messages` `stego_messages`
+
+
 3. Click on each table to verify the columns are created correctly
 
 ### 4. Update Environment Variables
@@ -55,6 +57,7 @@ VITE_SUPABASE_SUPABASE_ANON_KEY=your_supabase_anon_key
 - `sender_id`: Foreign key to users.id
 - `receiver_id`: Foreign key to users.id
 - `created_at`: Timestamp when record was created
+
 
 ## Security Notes
 

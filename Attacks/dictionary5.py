@@ -1,11 +1,10 @@
 import time
 import hashlib
-import os
-import sys
+from itertools import product
 
 # --- Target Password Setup (For Simulation ONLY) ---
-# A common dictionary word with a simple modification (capital 'P', 'o' -> '0')
-TARGET_PASSWORD = "44444"
+TARGET_PASSWORD = "00000"
+
 TARGET_HASH = hashlib.sha256(TARGET_PASSWORD.encode()).hexdigest()
 # ----------------------------------------------------
 
@@ -16,69 +15,50 @@ def check_password(candidate_password, target_hash):
     candidate_hash = hashlib.sha256(candidate_password.encode()).hexdigest()
     return candidate_hash == target_hash
 
-def load_wordlist(preferred_paths=None):
+def brute_force_5_char_password(target_hash):
     """
-    Load a wordlist from disk. Tries a list of candidate paths and returns
-    the first one found as a list of stripped lines.
-
-    Preference order defaults to ['worldlist.txt', 'password/wordlist.txt']
-    to accommodate the user's requested filename and the existing workspace.
+    Implements the brute force algorithm for 5-character passwords.
+    Character set: 0-9 (10 characters)
+    Total combinations: 10^5 = 100,000
     """
-    if preferred_paths is None:
-        preferred_paths = [
-            os.path.join(os.getcwd(), 'worldlist5.txt'),
-
-        ]
-
-    for path in preferred_paths:
-        if os.path.exists(path):
-            try:
-                with open(path, 'r', encoding='utf-8', errors='ignore') as f:
-                    words = [line.strip() for line in f if line.strip()]
-                print(f"[*] Loaded wordlist from: {path} ({len(words)} entries)")
-                return words
-            except Exception as e:
-                print(f"[!] Error reading wordlist {path}: {e}")
-
-    # If we reach here, no wordlist was found
-    print("[!] No wordlist found. Please provide 'worldlist.txt' or 'password/wordlist.txt' in the workspace.")
-    return []
-
-def dictionary_and_hybrid_attack(target_hash):
-    """
-    Implements a pure dictionary attack that reads candidates from an
-    external wordlist on disk. All hybrid/modification rules have been
-    removed per user request.
-    """
-    DICTIONARY = load_wordlist()
-
-    if not DICTIONARY:
-        return None
-
-    print(f"[*] Starting Dictionary Attack simulation (pure dictionary only)...")
+    PASSWORD_LENGTH = 5
+    CHAR_SET = '0123456789'
+    TOTAL_COMBOS = len(CHAR_SET) ** PASSWORD_LENGTH
+    
+    print(f"[*] Starting Brute Force simulation for {PASSWORD_LENGTH} character password...")
+    print(f"[*] Character set: {CHAR_SET}")
+    print(f"[*] Total combinations: {TOTAL_COMBOS:,}")
+    
     start_time = time.time()
     attempts = 0
 
-    print("\n--- Phase 1: Pure Dictionary Test ---")
-    for word in DICTIONARY:
+    # Iterating over the product of characters provides the necessary strings
+    for combination in product(CHAR_SET, repeat=PASSWORD_LENGTH):
+        candidate = "".join(combination)
         attempts += 1
-        if check_password(word, target_hash):
+
+        if check_password(candidate, target_hash):
             end_time = time.time()
             elapsed = end_time - start_time
-            print(f"\n[+] SUCCESS! Password found: '{word}' (Pure Dictionary)")
-            print(f"[#] Attempts: {attempts}")
+            print(f"\n[+] SUCCESS! Password found: '{candidate}'")
+            print(f"[#] Attempts: {attempts:,}")
             print(f"[#] Time taken: {elapsed:.4f} seconds")
-            return word
+            return candidate
 
-        # Optional: Print progress every 1000 attempts to avoid flooding
-        if attempts % 1000 == 0:
-            print(f"    Tested {attempts} candidates...", end='\r')
+        # Update progress less often as this loop is much faster
+        if attempts % 10000 == 0:
+            elapsed = time.time() - start_time
+            rate = attempts / elapsed if elapsed > 0 else 0
+            print(f"    Attempting: {candidate} ({attempts:,} attempts, {rate:.0f} attempts/sec)", end='\r')
 
     end_time = time.time()
     elapsed = end_time - start_time
-    print(f"\n[-] FAILED. Password not found after {attempts} attempts.")
+    print(f"\n[-] FAILED. Password not found after {attempts:,} attempts.")
+
     print(f"[#] Time taken: {elapsed:.4f} seconds")
     return None
 
 # Execute the simulation
-dictionary_and_hybrid_attack(TARGET_HASH)
+
+brute_force_5_char_password(TARGET_HASH)
+

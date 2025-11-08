@@ -1,5 +1,6 @@
 // [REMPLACER TOUT LE FICHIER conversation.js]
 
+
 const messagesArea = document.getElementById('messages-area');
 const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
@@ -209,8 +210,7 @@ function createCryptoMessageElement(message) {
              data-algo="${message.algo_name}" 
              data-key='${escapeHtml(message.algorithm_key || '{}')}'>
             ${messageText}
-        </div>
-        <div class="message-meta">Algorithme: ${capitalizeFirst(
+        </div>        <div class="message-meta">Algorithme: ${capitalizeFirst(
           message.algo_name,
         )}</div>
         ${
