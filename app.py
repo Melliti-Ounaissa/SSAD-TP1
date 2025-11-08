@@ -476,10 +476,10 @@ def start_attack_auth():
             attack_result = password_attack_service.dictionary3_attack(stored_hash, salt, username)
         elif method == 'dictionary5':
             # New method for 5-character dictionary
-            attack_result = password_attack_service.dictionary5_attack(stored_hash, salt, username)
+            attack_result = password_attack_service.brute_force_attack(stored_hash, salt, username, length=5)
         elif method == 'bruteforce':
             # Existing brute-force method
-            attack_result = password_attack_service.brute_force_6char_attack(stored_hash, salt, username)
+            attack_result = password_attack_service.brute_force_attack(stored_hash, salt, username, length=6)
         # You might want to remove or update the old combined 'dictionary' case if it exists:
         elif method == 'dictionary':
             # This is the old, combined attack. Consider removing it or using dictionary3_attack/dictionary5_attack here if you need it as a fallback.

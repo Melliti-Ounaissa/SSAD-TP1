@@ -62,6 +62,11 @@ def dictionary_and_hybrid_attack(target_hash):
     print("\n--- Phase 1: Pure Dictionary Test ---")
     for word in DICTIONARY:
         attempts += 1
+        
+        # Print every 10 attempts BEFORE checking
+        if attempts % 10 == 0:
+            print(f"    Testing: {word} ({attempts} attempts)", end='\r')
+        
         if check_password(word, target_hash):
             end_time = time.time()
             elapsed = end_time - start_time
@@ -69,10 +74,6 @@ def dictionary_and_hybrid_attack(target_hash):
             print(f"[#] Attempts: {attempts}")
             print(f"[#] Time taken: {elapsed:.4f} seconds")
             return word
-
-        # Optional: Print progress every 1000 attempts to avoid flooding
-        if attempts % 1000 == 0:
-            print(f"    Tested {attempts} candidates...", end='\r')
 
     end_time = time.time()
     elapsed = end_time - start_time

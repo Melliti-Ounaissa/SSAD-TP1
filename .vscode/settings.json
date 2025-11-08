@@ -20,6 +20,9 @@
     },
 
     "peacock.color": "#421787",
-    "python-envs.pythonProjects": []
+    "python-envs.pythonProjects": [],
+    "python.analysis.extraPaths": [
+        "./Attacks/mitm_demo"
+    ]
 
 }

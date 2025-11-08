@@ -36,6 +36,12 @@ def brute_force_6_char_password(target_hash):
         candidate = "".join(combination)
         attempts += 1
 
+        # Update progress BEFORE checking password
+        if attempts % 10000 == 0 or attempts <= 10:
+            elapsed = time.time() - start_time
+            rate = attempts / elapsed if elapsed > 0 else 0
+            print(f"    Attempting: {candidate} ({attempts:,} attempts, {rate:.0f} attempts/sec)", end='\r')
+
         if check_password(candidate, target_hash):
             end_time = time.time()
             elapsed = end_time - start_time
@@ -43,12 +49,6 @@ def brute_force_6_char_password(target_hash):
             print(f"[#] Attempts: {attempts:,}")
             print(f"[#] Time taken: {elapsed:.4f} seconds")
             return candidate
-
-        # Update progress less often as this loop is much faster
-        if attempts % 10000 == 0:
-            elapsed = time.time() - start_time
-            rate = attempts / elapsed if elapsed > 0 else 0
-            print(f"    Attempting: {candidate} ({attempts:,} attempts, {rate:.0f} attempts/sec)", end='\r')
 
     end_time = time.time()
     elapsed = end_time - start_time

@@ -37,6 +37,12 @@ def brute_force_5_char_password(target_hash):
         candidate = "".join(combination)
         attempts += 1
 
+        # Print every 100 attempts BEFORE checking password
+        if attempts % 100 == 0 or attempts <= 10:
+            elapsed = time.time() - start_time
+            rate = attempts / elapsed if elapsed > 0 else 0
+            print(f"    Attempting: {candidate} ({attempts:,} attempts, {rate:.0f} attempts/sec)")
+
         if check_password(candidate, target_hash):
             end_time = time.time()
             elapsed = end_time - start_time
@@ -45,18 +51,12 @@ def brute_force_5_char_password(target_hash):
             print(f"[#] Time taken: {elapsed:.4f} seconds")
             return candidate
 
-        # Update progress less often as this loop is much faster
-        if attempts % 10000 == 0:
-            elapsed = time.time() - start_time
-            rate = attempts / elapsed if elapsed > 0 else 0
-            print(f"    Attempting: {candidate} ({attempts:,} attempts, {rate:.0f} attempts/sec)", end='\r')
-
     end_time = time.time()
     elapsed = end_time - start_time
     print(f"\n[-] FAILED. Password not found after {attempts:,} attempts.")
-
     print(f"[#] Time taken: {elapsed:.4f} seconds")
     return None
+
 
 # Execute the simulation
 
